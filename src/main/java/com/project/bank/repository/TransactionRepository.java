@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-    List<Transaction> findTop5ByAccountIdOrderByDateDesc(Long accountId);
+    List<Transaction> findTop5ByAccountIdOrderByDateDesc(UUID accountId);
 }
 
