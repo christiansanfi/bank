@@ -11,4 +11,6 @@ public class GetTransactionDTO {
     private float amount;
     private String type;
     private LocalDateTime date;
+
+
 }
