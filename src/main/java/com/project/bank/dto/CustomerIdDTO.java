@@ -2,22 +2,11 @@ package com.project.bank.dto;
 
 import java.util.UUID;
 
-import com.project.bank.model.Customer;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 public class CustomerIdDTO {
     private UUID id;
-
-    public CustomerIdDTO(Customer customer) {
-        this.id = customer.getId();
-    }
-
-    public Customer toEntity() {
-        Customer customer = new Customer();
-        customer.setId(this.id);
-        return customer;
-    }
 }
