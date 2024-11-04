@@ -1,7 +1,7 @@
 package com.project.bank.mapper;
 
-import com.project.bank.dto.CustomerDTO;
-import com.project.bank.dto.CustomerIdDTO;
+import com.project.bank.dto.CustomerResponseDTO;
+import com.project.bank.dto.CustomerIdRequestDTO;
 import com.project.bank.dto.CustomerInfoDTO;
 import com.project.bank.model.Customer;
 
@@ -10,8 +10,8 @@ import java.util.UUID;
 
 public class CustomerMapper {
 
-    public CustomerDTO fromCustomerToCustomerDTo (Customer customer){
-        CustomerDTO customerDTO = new CustomerDTO();
+    public CustomerResponseDTO fromCustomerToCustomerDTo (Customer customer){
+        CustomerResponseDTO customerDTO = new CustomerResponseDTO();
         customerDTO.setId(customer.getId());
         customerDTO.setName(customer.getName());
         customerDTO.setBirthDate(customer.getBirthDate());
@@ -22,13 +22,13 @@ public class CustomerMapper {
 
     }
 
-    public CustomerIdDTO fromCustomerIdToCustomerIdDTO (UUID id){
-        CustomerIdDTO customerIdDTO = new CustomerIdDTO();
+    public CustomerIdRequestDTO fromCustomerIdToCustomerIdDTO (UUID id){
+        CustomerIdRequestDTO customerIdDTO = new CustomerIdRequestDTO();
         customerIdDTO.setId(id);
         return customerIdDTO;
     }
 
-    public UUID fromCustomerIdDtoToCustomerId (CustomerIdDTO customerIdDTO){
+    public UUID fromCustomerIdDtoToCustomerId (CustomerIdRequestDTO customerIdDTO){
         return customerIdDTO.getId();
     }
 

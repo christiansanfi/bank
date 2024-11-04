@@ -1,8 +1,8 @@
 package com.project.bank.mapper;
 
-import com.project.bank.dto.AccountDTO;
-import com.project.bank.dto.AccountIdDTO;
-import com.project.bank.dto.BalanceDTO;
+import com.project.bank.dto.AccountResponseDTO;
+import com.project.bank.dto.AccountIdRequestDTO;
+import com.project.bank.dto.BalanceResponseDTO;
 import com.project.bank.model.Account;
 
 import java.math.BigDecimal;
@@ -10,32 +10,32 @@ import java.util.UUID;
 
 public class AccountMapper {
 
-    public AccountDTO fromAccountToAccountDTO(Account account) {
-        AccountDTO accountDTO = new AccountDTO();
-        accountDTO.setId(account.getId());
-        accountDTO.setCustomerId(account.getCustomer().getId());
-        accountDTO.setBalance(account.getBalance());
-        accountDTO.setIban(account.getIban());
-        return accountDTO;
+    public AccountResponseDTO fromAccountToAccountDTO(Account account) {
+        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
+        accountResponseDTO.setId(account.getId());
+        accountResponseDTO.setCustomerId(account.getCustomer().getId());
+        accountResponseDTO.setBalance(account.getBalance());
+        accountResponseDTO.setIban(account.getIban());
+        return accountResponseDTO;
     }
 
-    public AccountIdDTO fromIdToAccountIdDTO (UUID id){
-        AccountIdDTO accountIdDTO = new AccountIdDTO();
+    public AccountIdRequestDTO fromIdToAccountIdDTO (UUID id){
+        AccountIdRequestDTO accountIdDTO = new AccountIdRequestDTO();
         accountIdDTO.setId(id);
         return accountIdDTO;
     }
 
-    public UUID fromAccountIdDtoToId (AccountIdDTO accountIdDTO){
-        return accountIdDTO.getId();
+    public UUID fromAccountIdRequestDtoToId (AccountIdRequestDTO accountIdRequestDTO){
+        return accountIdRequestDTO.getId();
     }
 
-    public BalanceDTO fromBalanceToBalanceDTO(BigDecimal balance){
-        BalanceDTO balanceDTO = new BalanceDTO();
-        balanceDTO.setBalance(balance);
-        return balanceDTO;
+    public BalanceResponseDTO fromBalanceToBalanceDTO(BigDecimal balance){
+        BalanceResponseDTO balanceResponseDTO = new BalanceResponseDTO();
+        balanceResponseDTO.setBalance(balance);
+        return balanceResponseDTO;
     }
 
-    public BigDecimal fromBalanceDtoToBalance(BalanceDTO balanceDTO){
+    public BigDecimal fromBalanceDtoToBalance(BalanceResponseDTO balanceDTO){
         return balanceDTO.getBalance();
     }
 }

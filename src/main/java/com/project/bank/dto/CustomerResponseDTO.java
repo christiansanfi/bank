@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 
-public class CustomerDTO {
+public class CustomerResponseDTO {
     private UUID id;
     private String name;
     private LocalDateTime birthDate;
