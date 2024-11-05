@@ -4,10 +4,12 @@ import com.project.bank.dto.CustomerResponseDTO;
 import com.project.bank.dto.CustomerIdRequestDTO;
 import com.project.bank.dto.CustomerInfoDTO;
 import com.project.bank.model.Customer;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Component
 public class CustomerMapper {
 
     public CustomerResponseDTO fromCustomerToCustomerDTo (Customer customer){
@@ -28,7 +30,7 @@ public class CustomerMapper {
         return customerIdDTO;
     }
 
-    public UUID fromCustomerIdDtoToCustomerId (CustomerIdRequestDTO customerIdDTO){
+    public UUID fromCustomerIdRequestDtoToCustomerId (CustomerIdRequestDTO customerIdDTO){
         return customerIdDTO.getId();
     }
 
@@ -40,6 +42,16 @@ public class CustomerMapper {
         customerInfoDTO.setBirthPlace(birthPlace);
         customerInfoDTO.setTaxCode(taxCode);
         customerInfoDTO.setAddress(address);
+        return  customerInfoDTO;
+    }
+
+    public CustomerInfoDTO fromCustomerToCustomerInfoDto (Customer customer){
+        CustomerInfoDTO customerInfoDTO = new CustomerInfoDTO();
+        customerInfoDTO.setName(customer.getName());
+        customerInfoDTO.setBirthDate(customer.getBirthDate());
+        customerInfoDTO.setBirthPlace(customer.getBirthPlace());
+        customerInfoDTO.setTaxCode(customer.getTaxCode());
+        customerInfoDTO.setAddress(customer.getAddress());
         return  customerInfoDTO;
     }
 
