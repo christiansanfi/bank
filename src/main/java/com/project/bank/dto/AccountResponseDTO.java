@@ -3,14 +3,14 @@ package com.project.bank.dto;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 
-public class AccountDTO {
-    private UUID accountId;
+public class AccountResponseDTO {
+    private UUID id;
     private UUID customerId;
     private BigDecimal balance;
     private String iban;

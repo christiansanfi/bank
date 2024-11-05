@@ -1,14 +1,14 @@
 package com.project.bank.dto;
 
-import java.util.UUID;
+import java.math.BigDecimal;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @NoArgsConstructor
 
-public class TransactionRequestDTO {
-    private UUID accountId;
-    private float amount;
+public class BalanceResponseDTO {
+    private BigDecimal balance;
 }

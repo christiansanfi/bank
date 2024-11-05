@@ -3,14 +3,14 @@ package com.project.bank.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 
-public class TransactionDTO {
-    private UUID transactionId;
+public class TransactionResponseDTO {
+    private UUID id;
     private UUID accountId;
     private float amount;
     private String type;

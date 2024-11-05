@@ -3,14 +3,14 @@ package com.project.bank.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 
-public class CustomerDTO {
-    private UUID customerId;
+public class CustomerResponseDTO {
+    private UUID id;
     private String name;
     private LocalDateTime birthDate;
     private String birthPlace;

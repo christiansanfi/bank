@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-
-public class TransactionRequestDTO {
-    private UUID accountId;
-    private float amount;
+public class AccountIdRequestDTO {
+    private UUID id;
 }
