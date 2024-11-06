@@ -7,6 +7,7 @@ import com.project.bank.model.Customer;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -34,25 +35,24 @@ public class CustomerMapper {
         return customerIdDTO.getId();
     }
 
-    public CustomerInfoDTO fromCustomerInfoToCustomerInfoDto
-    (String name, LocalDateTime birthDate, String birthPlace, String taxCode, String address){
-        CustomerInfoDTO customerInfoDTO = new CustomerInfoDTO();
-        customerInfoDTO.setName(name);
-        customerInfoDTO.setBirthDate(birthDate);
-        customerInfoDTO.setBirthPlace(birthPlace);
-        customerInfoDTO.setTaxCode(taxCode);
-        customerInfoDTO.setAddress(address);
-        return  customerInfoDTO;
+    public CustomerInfoDTO fromCustomerToCustomerInfoDto (Customer customer){
+        return  CustomerInfoDTO.builder()
+                .name(customer.getName())
+                .birthDate(customer.getBirthDate())
+                .birthPlace(customer.getBirthPlace())
+                .taxCode(customer.getTaxCode())
+                .address(customer.getAddress())
+                .build();
     }
 
-    public CustomerInfoDTO fromCustomerToCustomerInfoDto (Customer customer){
-        CustomerInfoDTO customerInfoDTO = new CustomerInfoDTO();
-        customerInfoDTO.setName(customer.getName());
-        customerInfoDTO.setBirthDate(customer.getBirthDate());
-        customerInfoDTO.setBirthPlace(customer.getBirthPlace());
-        customerInfoDTO.setTaxCode(customer.getTaxCode());
-        customerInfoDTO.setAddress(customer.getAddress());
-        return  customerInfoDTO;
+    public CustomerInfoDTO fromCustomerToCustomerInfoDto (Optional<Customer> customer){
+        return CustomerInfoDTO.builder()
+                .name(customer.get().getName())
+                .birthDate(customer.get().getBirthDate())
+                .birthPlace(customer.get().getBirthPlace())
+                .taxCode(customer.get().getTaxCode())
+                .address(customer.get().getAddress())
+                .build();
     }
 
     public Customer fromCustomerInfoDtoToCustomer (CustomerInfoDTO customerInfoDTO){

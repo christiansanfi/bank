@@ -3,6 +3,7 @@ package com.project.bank.service;
 import com.project.bank.dto.CustomerIdRequestDTO;
 import com.project.bank.dto.CustomerInfoDTO;
 import com.project.bank.dto.CustomerResponseDTO;
+import com.project.bank.exception.CustomerNotFoundException;
 import com.project.bank.mapper.CustomerMapper;
 import com.project.bank.model.Customer;
 import com.project.bank.repository.CustomerRepository;
@@ -34,15 +35,8 @@ public class CustomerService {
 
     public CustomerInfoDTO getCustomerDetails(CustomerIdRequestDTO customerIdRequestDTO){
         UUID id = customerMapper.fromCustomerIdRequestDtoToCustomerId(customerIdRequestDTO);
-        Optional<Customer> customer = customerRepository.findById(id);
-
-        String nome = customer.get().getName();
-        LocalDateTime birthDate = customer.get().getBirthDate();
-        String birtPlace = customer.get().getBirthPlace();
-        String taxCode = customer.get().getTaxCode();
-        String address = customer.get().getAddress();
-
-        return customerMapper.fromCustomerInfoToCustomerInfoDto(nome, birthDate, birtPlace, taxCode, address);
+        Optional<Customer> customer = Optional.ofNullable(customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + id + " not found")));
+        return customerMapper.fromCustomerToCustomerInfoDto(customer);
     }
 
     public CustomerInfoDTO updateCustomer(CustomerIdRequestDTO customerIdRequestDTO, CustomerInfoDTO customerInfoDTO){

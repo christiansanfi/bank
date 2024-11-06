@@ -5,6 +5,7 @@ import com.project.bank.dto.CustomerInfoDTO;
 import com.project.bank.dto.CustomerResponseDTO;
 import com.project.bank.model.Customer;
 import com.project.bank.service.CustomerService;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,15 +45,10 @@ public class CustomerController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable String id ) {
-        if (id == null) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Void> deleteCustomer(@PathVariable @NotBlank String id ) {
         CustomerIdRequestDTO customerIdRequestDTO = new CustomerIdRequestDTO();
         customerIdRequestDTO.setId(UUID.fromString(id));
-
         customerService.deleteCustomer(customerIdRequestDTO);
         return ResponseEntity.noContent().build();
     }
-
 }
