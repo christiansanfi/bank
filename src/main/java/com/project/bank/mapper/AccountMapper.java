@@ -4,10 +4,12 @@ import com.project.bank.dto.AccountResponseDTO;
 import com.project.bank.dto.AccountIdRequestDTO;
 import com.project.bank.dto.BalanceResponseDTO;
 import com.project.bank.model.Account;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@Component
 public class AccountMapper {
 
     public AccountResponseDTO fromAccountToAccountDTO(Account account) {
