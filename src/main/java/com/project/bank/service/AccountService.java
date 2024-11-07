@@ -2,6 +2,8 @@
 package com.project.bank.service;
 
 import com.project.bank.dto.*;
+import com.project.bank.exception.AccountNotFoundException;
+import com.project.bank.exception.CustomerNotFoundException;
 import com.project.bank.mapper.AccountMapper;
 import com.project.bank.mapper.CustomerMapper;
 import com.project.bank.model.Account;
@@ -10,9 +12,6 @@ import com.project.bank.repository.AccountRepository;
 import com.project.bank.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,44 +32,23 @@ public class AccountService {
 
     public  AccountResponseDTO createAccount(CustomerIdRequestDTO customerIdRequestDTO){
         UUID id = customerMapper.fromCustomerIdRequestDtoToCustomerId(customerIdRequestDTO);
-        Optional<Customer> customer = customerRepository.findById(id);
-        //To verify if the customer exist, ##ADD AN EXCEPTION
-        if(customer.isEmpty()){
-            throw new IllegalArgumentException("Customer not found!");
-        }
-
-        Account account = new Account();
-        account.setId(UUID.randomUUID());
-        account.setBalance(BigDecimal.ZERO);
-        account.setCustomer(customer.get());
-        account.setIban(generateRandomIban());
-        Account savedAccount = accountRepository.save(account);
-
+        Customer customer = customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + id + " not found"));
+        Account savedAccount = accountRepository.save(accountMapper.fromCustomerToAccount(customer));
         return accountMapper.fromAccountToAccountDTO(savedAccount);
     }
 
-    public BalanceResponseDTO getBalance(AccountIdRequestDTO accountIdRequestDTO){
-        UUID id = accountMapper.fromAccountIdRequestDtoToId(accountIdRequestDTO);
-        Account account = accountRepository.getReferenceById(id);
-        BalanceResponseDTO balanceResponseDTO = new BalanceResponseDTO();
-        balanceResponseDTO.setBalance(account.getBalance());
-        return balanceResponseDTO;
+    public BalanceResponseDTO getBalance(UUID id){
+        Account account = accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException("Account with ID: " + id + " not found"));
+        return accountMapper.fromBalanceToBalanceDTO(account.getBalance());
     }
-
 
     public void deleteAccount(AccountIdRequestDTO accountIdRequestDTO){
         UUID id = accountMapper.fromAccountIdRequestDtoToId(accountIdRequestDTO);
         if(accountRepository.existsById(id)){
             accountRepository.deleteById(id);
         } else{
-            throw new IllegalArgumentException("Account not found");
+            throw new AccountNotFoundException("Account with id " + id + " not found");
         }
     }
-
-
-    private String generateRandomIban(){
-        return "IT" + (int)(Math.random() * 89 + 10) + "X0542811101000000" + (int)(Math.random() * 8999999 + 1000000);
-    }
-
 }
 
