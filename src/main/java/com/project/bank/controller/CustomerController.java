@@ -29,9 +29,9 @@ public class CustomerController {
         return ResponseEntity.ok(createdCustomer);
     }
 
-    @GetMapping
-    public ResponseEntity<CustomerInfoDTO> getCustomerDetails(@RequestBody CustomerIdRequestDTO customerIdRequestDTO){
-        CustomerInfoDTO customerInfoDTO = customerService.getCustomerDetails(customerIdRequestDTO);
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomerInfoDTO> getCustomerDetails(@PathVariable("id") UUID id){
+        CustomerInfoDTO customerInfoDTO = customerService.getCustomerDetails(id);
         return ResponseEntity.ok(customerInfoDTO);
     }
 
@@ -45,9 +45,9 @@ public class CustomerController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable @NotBlank String id ) {
+    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") @NotBlank UUID id ) {
         CustomerIdRequestDTO customerIdRequestDTO = new CustomerIdRequestDTO();
-        customerIdRequestDTO.setId(UUID.fromString(id));
+        customerIdRequestDTO.setId(id);
         customerService.deleteCustomer(customerIdRequestDTO);
         return ResponseEntity.noContent().build();
     }

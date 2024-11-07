@@ -33,21 +33,15 @@ public class CustomerService {
         return customerMapper.fromCustomerToCustomerDTo(savedCustomer);
     }
 
-    public CustomerInfoDTO getCustomerDetails(CustomerIdRequestDTO customerIdRequestDTO){
-        UUID id = customerMapper.fromCustomerIdRequestDtoToCustomerId(customerIdRequestDTO);
-        Optional<Customer> customer = Optional.ofNullable(customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + id + " not found")));
+    public CustomerInfoDTO getCustomerDetails(UUID id){
+        Customer customer = customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + id + " not found"));
         return customerMapper.fromCustomerToCustomerInfoDto(customer);
     }
 
     public CustomerInfoDTO updateCustomer(CustomerIdRequestDTO customerIdRequestDTO, CustomerInfoDTO customerInfoDTO){
         UUID id = customerMapper.fromCustomerIdRequestDtoToCustomerId(customerIdRequestDTO);
-        Customer customer = customerRepository.getReferenceById(id);
-        Customer newCustomerinfo = customerMapper.fromCustomerInfoDtoToCustomer(customerInfoDTO);
-        customer.setName(newCustomerinfo.getName());
-        customer.setBirthDate(newCustomerinfo.getBirthDate());
-        customer.setBirthPlace(newCustomerinfo.getBirthPlace());
-        customer.setTaxCode(newCustomerinfo.getTaxCode());
-        customer.setAddress(newCustomerinfo.getAddress());
+        Customer customer = customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + id + " not found"));
+        customerMapper.updateCustomerFromInfoDto(customer, customerInfoDTO);
         customer = customerRepository.save(customer);
         return customerMapper.fromCustomerToCustomerInfoDto(customer);
     }
@@ -57,7 +51,7 @@ public class CustomerService {
         if (customerRepository.existsById(id)){
             customerRepository.deleteById(id);
         } else {
-            throw new IllegalArgumentException("Customer not found"); ////////////
+            throw new CustomerNotFoundException("Customer not found");
         }
     }
 
