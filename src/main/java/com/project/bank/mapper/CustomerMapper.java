@@ -64,4 +64,13 @@ public class CustomerMapper {
         customer.setAddress(customerInfoDTO.getAddress());
         return customer;
     }
+
+    public void updateCustomerFromInfoDto(Customer customer, CustomerInfoDTO customerInfoDTO) {
+        customer.setName(customerInfoDTO.getName());
+        customer.setBirthDate(customerInfoDTO.getBirthDate());
+        customer.setBirthPlace(customerInfoDTO.getBirthPlace());
+        customer.setTaxCode(customerInfoDTO.getTaxCode());
+        customer.setAddress(customerInfoDTO.getAddress());
+    }
+
 }
