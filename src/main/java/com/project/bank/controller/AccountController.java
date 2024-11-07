@@ -29,16 +29,16 @@ public class AccountController {
         return new ResponseEntity<>(accountResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<BalanceResponseDTO> getBalance(@RequestBody AccountIdRequestDTO accountIdRequestDTO){
-        BalanceResponseDTO balanceResponseDTO = accountService.getBalance(accountIdRequestDTO);
+    @GetMapping("/{id}")
+    public ResponseEntity<BalanceResponseDTO> getBalance(@PathVariable("id") UUID id){
+        BalanceResponseDTO balanceResponseDTO = accountService.getBalance(id);
         return ResponseEntity.ok(balanceResponseDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable String id ){
+    public ResponseEntity<Void> deleteAccount(@PathVariable("id") UUID id ){
         AccountIdRequestDTO accountIdRequestDTO = new AccountIdRequestDTO();
-        accountIdRequestDTO.setId(UUID.fromString(id));
+        accountIdRequestDTO.setId(id);
         accountService.deleteAccount(accountIdRequestDTO);
         return ResponseEntity.noContent().build();
     }

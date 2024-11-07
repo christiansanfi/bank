@@ -4,6 +4,8 @@ import com.project.bank.dto.AccountResponseDTO;
 import com.project.bank.dto.AccountIdRequestDTO;
 import com.project.bank.dto.BalanceResponseDTO;
 import com.project.bank.model.Account;
+import com.project.bank.model.Customer;
+import com.project.bank.service.AccountService;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -35,6 +37,19 @@ public class AccountMapper {
         BalanceResponseDTO balanceResponseDTO = new BalanceResponseDTO();
         balanceResponseDTO.setBalance(balance);
         return balanceResponseDTO;
+    }
+
+    public Account fromCustomerToAccount(Customer customer){
+        Account account = new Account();
+        account.setId(UUID.randomUUID());
+        account.setBalance(BigDecimal.ZERO);
+        account.setCustomer(customer);
+        account.setIban(generateRandomIban());
+        return account;
+    }
+
+    private String generateRandomIban(){
+        return "IT" + (int)(Math.random() * 89 + 10) + "X0542811101000000" + (int)(Math.random() * 8999999 + 1000000);
     }
 
     public BigDecimal fromBalanceDtoToBalance(BalanceResponseDTO balanceDTO){
