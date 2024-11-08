@@ -42,13 +42,21 @@ public class AccountService {
         return accountMapper.fromBalanceToBalanceDTO(account.getBalance());
     }
 
-    public void deleteAccount(AccountIdRequestDTO accountIdRequestDTO){
-        UUID id = accountMapper.fromAccountIdRequestDtoToId(accountIdRequestDTO);
+    public AccountResponseDTO getAccountFromId(UUID id){
+        Account account = accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException("Account with id " + id + " not found"));
+        return accountMapper.fromAccountToAccountResponseDTO(account);
+    }
+
+    public void deleteAccount(UUID id){
         if(accountRepository.existsById(id)){
             accountRepository.deleteById(id);
         } else{
             throw new AccountNotFoundException("Account with id " + id + " not found");
         }
+    }
+
+    public String generateRandomIban(){
+        return "IT" + (int)(Math.random() * 89 + 10) + "X0542811101000000" + (int)(Math.random() * 8999999 + 1000000);
     }
 }
 
