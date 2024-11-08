@@ -4,10 +4,7 @@ import com.project.bank.dto.CustomerIdRequestDTO;
 import com.project.bank.dto.GetTransactionResponseDTO;
 import com.project.bank.dto.TransactionRequestDTO;
 import com.project.bank.dto.TransactionResponseDTO;
-import com.project.bank.exception.CustomerNotFoundException;
-import com.project.bank.exception.InsufficientBalanceException;
-import com.project.bank.exception.NegativeAmountException;
-import com.project.bank.exception.TransactionNotFoundException;
+import com.project.bank.exception.*;
 import com.project.bank.mapper.AccountMapper;
 import com.project.bank.mapper.TransactionMapper;
 import com.project.bank.model.Account;
@@ -19,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -38,39 +36,51 @@ public class TransactionService {
     }
 
     public GetTransactionResponseDTO deposit(TransactionRequestDTO transactionRequestDTO){
-            if (transactionRequestDTO.getAmount().compareTo(BigDecimal.ZERO)>0){
+            if (isAmountPositive(transactionRequestDTO.getAmount())){
                 UUID id = transactionRequestDTO.getAccountId();
                 Account account = accountRepository.getReferenceById(id);
-
                 Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO,"deposit",account);
                 transaction = transactionRepository.save(transaction);
-                BigDecimal balance = account.getBalance();
-                balance = balance.add(transactionRequestDTO.getAmount());
-                account.setBalance(balance);
+                updateBalance(account,transactionRequestDTO.getAmount());
                 account = accountRepository.save(account);
                 return transactionMapper.fromTransactionToGetTransactionResponseDto(transaction);
             } else {
                 throw new NegativeAmountException("Amount must be higher than 0");
             }
     }
-/*
-    public TransactionResponseDTO withdraw(TransactionRequestDTO transactionRequestDTO){
-        UUID id = transactionRequestDTO.getAccountId();
-        Account account = accountRepository.getReferenceById(id);
-        BigDecimal balance = account.getBalance();
-        if (transactionRequestDTO.getAmount().compareTo(BigDecimal.ZERO) > 0){
-            if (balance.compareTo(transactionRequestDTO.getAmount()) >= 0){
-                return transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, "withdraw");
-            } throw new InsufficientBalanceException("Balance is not sufficient to cover the withdraw");
-        }throw new NegativeAmountException("Amount must be higher than 0");
-    }*/
 
-    /*
+    public GetTransactionResponseDTO withdraw(TransactionRequestDTO transactionRequestDTO){
+        if (isAmountPositive(transactionRequestDTO.getAmount())){
+            UUID id = transactionRequestDTO.getAccountId();
+            Account account = accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException("Account with id: " + id + " not found"));
+            if (isBalanceSufficient(account.getBalance(),transactionRequestDTO.getAmount())){
+                Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO,"withdraw",account);
+                transaction = transactionRepository.save(transaction);
+                updateBalance(account,transactionRequestDTO.getAmount().negate());
+                account = accountRepository.save(account);
+                return transactionMapper.fromTransactionToGetTransactionResponseDto(transaction);
+            } throw new InsufficientBalanceException("Balance is not sufficient to cover the withdraw");
+        } throw new NegativeAmountException("Amount must be higher than 0");
+    }
+
+    private void updateBalance(Account account, BigDecimal amount) {
+        BigDecimal balance = account.getBalance();
+        balance = balance.add(amount);
+        account.setBalance(balance);
+    }
+
+    private boolean isAmountPositive(BigDecimal amount){
+        return amount.compareTo(BigDecimal.ZERO) > 0;
+    }
+
+    private boolean isBalanceSufficient(BigDecimal accountBalance, BigDecimal withdrawAmount){
+        return accountBalance.compareTo(withdrawAmount) >= 0;
+    }
+/*
     public List<Transaction> getLastFiveTransactions(UUID accountId) {
         return transactionRepository.findTop5ByAccountIdOrderByDateDesc(accountId);
     }
-    */
-
+*/
     public void deleteTransaction (UUID id){
         if (transactionRepository.existsById(id)){
             transactionRepository.deleteById(id);

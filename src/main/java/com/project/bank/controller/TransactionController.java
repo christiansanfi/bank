@@ -25,6 +25,12 @@ public class TransactionController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/withdraw")
+    public ResponseEntity<GetTransactionResponseDTO> withdraw(@RequestBody TransactionRequestDTO transactionRequestDTO){
+        GetTransactionResponseDTO transactionResponseDTO = transactionService.withdraw(transactionRequestDTO);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTransaction(@PathVariable("id")UUID id){
         transactionService.deleteTransaction(id);
