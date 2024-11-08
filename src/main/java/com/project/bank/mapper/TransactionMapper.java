@@ -3,8 +3,14 @@ package com.project.bank.mapper;
 import com.project.bank.dto.GetTransactionResponseDTO;
 import com.project.bank.dto.TransactionRequestDTO;
 import com.project.bank.dto.TransactionResponseDTO;
+import com.project.bank.model.Account;
 import com.project.bank.model.Transaction;
+import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Component
 public class TransactionMapper {
 
     public TransactionResponseDTO fromTransactionToTransactionResponseDto (Transaction transaction){
@@ -30,5 +36,15 @@ public class TransactionMapper {
         getTransactionResponseDTO.setType(transaction.getType());
         getTransactionResponseDTO.setDate(transaction.getDate());
         return getTransactionResponseDTO;
+    }
+
+    public Transaction fromTransactionRequestDTOToTransactionResponseDTO(TransactionRequestDTO transactionRequestDTO, String type, Account account){
+        Transaction transaction = new Transaction();
+        transaction.setId(UUID.randomUUID());
+        transaction.setAccount(account);
+        transaction.setType(type);
+        transaction.setDate(LocalDateTime.now());
+        transaction.setAmount(transactionRequestDTO.getAmount());
+        return transaction;
     }
 }
