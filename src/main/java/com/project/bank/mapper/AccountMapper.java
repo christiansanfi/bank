@@ -45,12 +45,12 @@ public class AccountMapper {
         return balanceResponseDTO;
     }
 
-    public Account fromCustomerToAccount(Customer customer){
+    public Account fromCustomerToAccount(Customer customer, String iban){
         Account account = new Account();
         account.setId(UUID.randomUUID());
         account.setBalance(BigDecimal.ZERO);
         account.setCustomer(customer);
-        account.setIban(accountService.generateRandomIban());
+        account.setIban(iban);
         return account;
     }
 
