@@ -7,6 +7,7 @@ import com.project.bank.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -29,6 +30,12 @@ public class TransactionController {
     public ResponseEntity<GetTransactionResponseDTO> withdraw(@RequestBody TransactionRequestDTO transactionRequestDTO){
         GetTransactionResponseDTO transactionResponseDTO = transactionService.withdraw(transactionRequestDTO);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/last-five/{accountId}")
+    public ResponseEntity<List<GetTransactionResponseDTO>> getLastFiveTransactions(@PathVariable UUID accountId){
+        List<GetTransactionResponseDTO> response = transactionService.getLastFiveTransactions(accountId);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")

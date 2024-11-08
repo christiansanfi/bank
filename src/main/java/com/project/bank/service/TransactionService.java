@@ -12,12 +12,15 @@ import com.project.bank.model.Transaction;
 import com.project.bank.repository.AccountRepository;
 import com.project.bank.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -76,11 +79,15 @@ public class TransactionService {
     private boolean isBalanceSufficient(BigDecimal accountBalance, BigDecimal withdrawAmount){
         return accountBalance.compareTo(withdrawAmount) >= 0;
     }
-/*
-    public List<Transaction> getLastFiveTransactions(UUID accountId) {
-        return transactionRepository.findTop5ByAccountIdOrderByDateDesc(accountId);
+
+    public List<GetTransactionResponseDTO> getLastFiveTransactions(UUID accountId) {
+        Pageable pageable = PageRequest.of(0,5);
+        List<Transaction> transactions = transactionRepository.findTop5ByAccountIdOrderByDateDesc(accountId, pageable);
+        return transactions.stream()
+                .map(transactionMapper::fromTransactionToGetTransactionResponseDto)
+                .collect(Collectors.toUnmodifiableList());
     }
-*/
+
     public void deleteTransaction (UUID id){
         if (transactionRepository.existsById(id)){
             transactionRepository.deleteById(id);
