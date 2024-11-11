@@ -4,6 +4,7 @@ import com.project.bank.dto.AccountResponseDTO;
 import com.project.bank.dto.BalanceResponseDTO;
 import com.project.bank.dto.CustomerIdRequestDTO;
 import com.project.bank.service.AccountService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +14,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/accounts")
+@RequiredArgsConstructor
 public class AccountController {
 
     private final AccountService accountService;
-
-    @Autowired
-    public AccountController(AccountService accountService) {
-        this.accountService = accountService;
-    }
 
     @PostMapping
     public ResponseEntity<AccountResponseDTO> createAccount(@RequestBody CustomerIdRequestDTO customerIdRequestDTO) {
@@ -45,6 +42,4 @@ public class AccountController {
         accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }

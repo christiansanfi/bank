@@ -7,6 +7,7 @@ import com.project.bank.exception.CustomerNotFoundException;
 import com.project.bank.mapper.CustomerMapper;
 import com.project.bank.model.Customer;
 import com.project.bank.repository.CustomerRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +16,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerService {
 
     public final CustomerRepository customerRepository;
     public final CustomerMapper customerMapper;
-
-    @Autowired
-    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper) {
-        this.customerRepository = customerRepository;
-        this.customerMapper = customerMapper;
-    }
 
     public CustomerResponseDTO createCustomer (CustomerInfoDTO customerInfoDTO){
         Customer customer = customerMapper.fromCustomerInfoDtoToCustomer(customerInfoDTO);
