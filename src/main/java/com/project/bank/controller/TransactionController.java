@@ -1,8 +1,7 @@
 package com.project.bank.controller;
 
-import com.project.bank.dto.GetTransactionResponseDTO;
-import com.project.bank.dto.TransactionRequestDTO;
 import com.project.bank.dto.TransactionResponseDTO;
+import com.project.bank.dto.TransactionRequestDTO;
 import com.project.bank.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +19,20 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping("/deposit")
-    public ResponseEntity<GetTransactionResponseDTO> deposit(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO){
-        GetTransactionResponseDTO transactionResponseDTO = transactionService.deposit(transactionRequestDTO);
+    public ResponseEntity<TransactionResponseDTO> deposit(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO){
+        TransactionResponseDTO transactionResponseDTO = transactionService.deposit(transactionRequestDTO);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<GetTransactionResponseDTO> withdraw(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO){
-        GetTransactionResponseDTO transactionResponseDTO = transactionService.withdraw(transactionRequestDTO);
+    public ResponseEntity<TransactionResponseDTO> withdraw(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO){
+        TransactionResponseDTO transactionResponseDTO = transactionService.withdraw(transactionRequestDTO);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/last-five/{accountId}")
-    public ResponseEntity<List<GetTransactionResponseDTO>> getLastFiveTransactions(@PathVariable UUID accountId){
-        List<GetTransactionResponseDTO> response = transactionService.getLastFiveTransactions(accountId);
+    public ResponseEntity<List<TransactionResponseDTO>> getLastFiveTransactions(@PathVariable UUID accountId){
+        List<TransactionResponseDTO> response = transactionService.getLastFiveTransactions(accountId);
         return ResponseEntity.ok(response);
     }
 
