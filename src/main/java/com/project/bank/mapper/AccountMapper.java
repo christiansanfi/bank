@@ -14,6 +14,12 @@ import java.util.UUID;
 @Component
 public class AccountMapper {
 
+    private final AccountService accountService;
+
+    public AccountMapper(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
     public AccountResponseDTO fromAccountToAccountDTO(Account account) {
         AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
         accountResponseDTO.setId(account.getId());
@@ -39,17 +45,22 @@ public class AccountMapper {
         return balanceResponseDTO;
     }
 
-    public Account fromCustomerToAccount(Customer customer){
+    public Account fromCustomerToAccount(Customer customer, String iban){
         Account account = new Account();
         account.setId(UUID.randomUUID());
         account.setBalance(BigDecimal.ZERO);
         account.setCustomer(customer);
-        account.setIban(generateRandomIban());
+        account.setIban(iban);
         return account;
     }
 
-    private String generateRandomIban(){
-        return "IT" + (int)(Math.random() * 89 + 10) + "X0542811101000000" + (int)(Math.random() * 8999999 + 1000000);
+    public AccountResponseDTO fromAccountToAccountResponseDTO (Account account){
+        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
+        accountResponseDTO.setId(account.getId());
+        accountResponseDTO.setIban(account.getIban());
+        accountResponseDTO.setBalance(account.getBalance());
+        accountResponseDTO.setCustomerId(account.getCustomer().getId());
+        return accountResponseDTO;
     }
 
     public BigDecimal fromBalanceDtoToBalance(BalanceResponseDTO balanceDTO){
