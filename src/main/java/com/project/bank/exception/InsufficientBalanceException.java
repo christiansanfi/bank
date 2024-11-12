@@ -1,7 +1,7 @@
 package com.project.bank.exception;
 
-public class InsufficientBalanceException extends RuntimeException{
-    public InsufficientBalanceException(String message){
+public class InsufficientBalanceException extends RuntimeException {
+    public InsufficientBalanceException(String message) {
         super(message);
     }
 }

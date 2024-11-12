@@ -1,11 +1,10 @@
 package com.project.bank.mapper;
 
 import com.project.bank.dto.AccountResponseDTO;
-import com.project.bank.dto.AccountIdRequestDTO;
 import com.project.bank.dto.BalanceResponseDTO;
 import com.project.bank.model.Account;
 import com.project.bank.model.Customer;
-import com.project.bank.service.AccountService;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -23,23 +22,13 @@ public class AccountMapper {
         return accountResponseDTO;
     }
 
-    public AccountIdRequestDTO fromIdToAccountIdDTO (UUID id){
-        AccountIdRequestDTO accountIdDTO = new AccountIdRequestDTO();
-        accountIdDTO.setId(id);
-        return accountIdDTO;
-    }
-
-    public UUID fromAccountIdRequestDtoToId (AccountIdRequestDTO accountIdRequestDTO){
-        return accountIdRequestDTO.getId();
-    }
-
-    public BalanceResponseDTO fromBalanceToBalanceDTO(BigDecimal balance){
+    public BalanceResponseDTO fromBalanceToBalanceDTO(BigDecimal balance) {
         BalanceResponseDTO balanceResponseDTO = new BalanceResponseDTO();
         balanceResponseDTO.setBalance(balance);
         return balanceResponseDTO;
     }
 
-    public Account fromCustomerToAccount(Customer customer, String iban){
+    public Account fromCustomerToAccount(Customer customer, String iban) {
         Account account = new Account();
         account.setId(UUID.randomUUID());
         account.setBalance(BigDecimal.ZERO);
@@ -48,7 +37,7 @@ public class AccountMapper {
         return account;
     }
 
-    public AccountResponseDTO fromAccountToAccountResponseDTO (Account account){
+    public AccountResponseDTO fromAccountToAccountResponseDTO(Account account) {
         AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
         accountResponseDTO.setId(account.getId());
         accountResponseDTO.setIban(account.getIban());
@@ -57,8 +46,5 @@ public class AccountMapper {
         return accountResponseDTO;
     }
 
-    public BigDecimal fromBalanceDtoToBalance(BalanceResponseDTO balanceDTO){
-        return balanceDTO.getBalance();
-    }
 }
 
