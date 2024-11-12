@@ -40,7 +40,7 @@ public class CustomerController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") @NotBlank UUID id) {
+    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") UUID id) {
         CustomerIdRequestDTO customerIdRequestDTO = new CustomerIdRequestDTO();
         customerIdRequestDTO.setId(id);
         customerService.deleteCustomer(customerIdRequestDTO);
