@@ -12,7 +12,7 @@ import java.util.UUID;
 @Component
 public class TransactionMapper {
 
-    public TransactionResponseDTO fromTransactionToGetTransactionResponseDto(Transaction transaction){
+    public TransactionResponseDTO fromTransactionToGetTransactionResponseDto(Transaction transaction) {
         TransactionResponseDTO transactionResponseDTO = new TransactionResponseDTO();
         transactionResponseDTO.setAmount(transaction.getAmount());
         transactionResponseDTO.setType(transaction.getType());
@@ -20,7 +20,7 @@ public class TransactionMapper {
         return transactionResponseDTO;
     }
 
-    public Transaction fromTransactionRequestDTOToTransactionResponseDTO(TransactionRequestDTO transactionRequestDTO, String type, Account account){
+    public Transaction fromTransactionRequestDTOToTransactionResponseDTO(TransactionRequestDTO transactionRequestDTO, String type, Account account) {
         Transaction transaction = new Transaction();
         transaction.setId(UUID.randomUUID());
         transaction.setAccount(account);

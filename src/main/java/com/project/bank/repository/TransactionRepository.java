@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
     //@Query("SELECT t FROM Transaction t WHERE t.account.id = :accountId ORDER BY t.date DESC LIMIT 5")
-    List<Transaction> findByAccountId (@Param("accountId") UUID accountId);
+    List<Transaction> findByAccountId(@Param("accountId") UUID accountId);
 
 }
 

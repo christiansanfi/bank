@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -19,28 +18,27 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping("/deposit")
-    public ResponseEntity<TransactionResponseDTO> deposit(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO){
+    public ResponseEntity<TransactionResponseDTO> deposit(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO) {
         TransactionResponseDTO transactionResponseDTO = transactionService.deposit(transactionRequestDTO);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<TransactionResponseDTO> withdraw(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO){
+    public ResponseEntity<TransactionResponseDTO> withdraw(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO) {
         TransactionResponseDTO transactionResponseDTO = transactionService.withdraw(transactionRequestDTO);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/last-five/{accountId}")
-    public ResponseEntity<List<TransactionResponseDTO>> getLastFiveTransactions(@PathVariable UUID accountId){
+    public ResponseEntity<List<TransactionResponseDTO>> getLastFiveTransactions(@PathVariable UUID accountId) {
         List<TransactionResponseDTO> response = transactionService.getLastFiveTransactions(accountId);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable("id")UUID id){
+    public ResponseEntity<Void> deleteTransaction(@PathVariable("id") UUID id) {
         transactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
     }
-
 
 }

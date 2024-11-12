@@ -11,7 +11,6 @@ import com.project.bank.model.Customer;
 import com.project.bank.repository.AccountRepository;
 import com.project.bank.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

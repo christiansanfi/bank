@@ -3,7 +3,6 @@ package com.project.bank.service;
 import com.project.bank.dto.TransactionResponseDTO;
 import com.project.bank.dto.TransactionRequestDTO;
 import com.project.bank.exception.*;
-import com.project.bank.mapper.AccountMapper;
 import com.project.bank.mapper.TransactionMapper;
 import com.project.bank.model.Account;
 import com.project.bank.model.Transaction;
@@ -23,7 +22,6 @@ public class TransactionService {
 
     public final TransactionRepository transactionRepository;
     public final TransactionMapper transactionMapper;
-    public final AccountMapper accountMapper;
     public final AccountRepository accountRepository;
 
 
