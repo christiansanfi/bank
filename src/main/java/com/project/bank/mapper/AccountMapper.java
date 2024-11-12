@@ -14,12 +14,6 @@ import java.util.UUID;
 @Component
 public class AccountMapper {
 
-    private final AccountService accountService;
-
-    public AccountMapper(AccountService accountService) {
-        this.accountService = accountService;
-    }
-
     public AccountResponseDTO fromAccountToAccountDTO(Account account) {
         AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
         accountResponseDTO.setId(account.getId());

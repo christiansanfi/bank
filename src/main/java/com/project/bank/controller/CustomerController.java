@@ -6,6 +6,7 @@ import com.project.bank.dto.CustomerResponseDTO;
 import com.project.bank.model.Customer;
 import com.project.bank.service.CustomerService;
 import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customers")
+@RequiredArgsConstructor
 public class CustomerController {
 
     private final CustomerService customerService;
-
-    @Autowired
-    public CustomerController(CustomerService customerService) {
-        this.customerService = customerService;
-    }
 
     @PostMapping
     public ResponseEntity<CustomerResponseDTO> createCustomer(@RequestBody CustomerInfoDTO customerInfoDTO) {
