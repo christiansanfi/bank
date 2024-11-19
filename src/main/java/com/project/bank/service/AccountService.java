@@ -5,7 +5,6 @@ import com.project.bank.dto.*;
 import com.project.bank.exception.AccountNotFoundException;
 import com.project.bank.exception.CustomerNotFoundException;
 import com.project.bank.mapper.AccountMapper;
-import com.project.bank.mapper.CustomerMapper;
 import com.project.bank.model.Account;
 import com.project.bank.model.Customer;
 import com.project.bank.repository.AccountRepository;
@@ -22,10 +21,8 @@ public class AccountService {
     public final AccountRepository accountRepository;
     public final AccountMapper accountMapper;
     public final CustomerRepository customerRepository;
-    public final CustomerMapper customerMapper;
 
-    public AccountResponseDTO createAccount(CustomerIdRequestDTO customerIdRequestDTO) {
-        UUID id = customerMapper.fromCustomerIdRequestDtoToCustomerId(customerIdRequestDTO);
+    public AccountResponseDTO createAccount(UUID id) {
         Customer customer = customerRepository.findById(id).orElseThrow(() -> new CustomerNotFoundException("Customer with ID: " + id + " not found"));
         Account savedAccount = accountRepository.save(accountMapper.fromCustomerToAccount(customer, generateRandomIban()));
         return accountMapper.fromAccountToAccountDTO(savedAccount);
