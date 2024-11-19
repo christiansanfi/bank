@@ -2,6 +2,7 @@ package com.project.bank.controller;
 
 import com.project.bank.dto.AccountResponseDTO;
 import com.project.bank.dto.BalanceResponseDTO;
+import com.project.bank.dto.CreateAccountRequestDTO;
 import com.project.bank.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,8 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping
-    public ResponseEntity<AccountResponseDTO> createAccount(@PathVariable("id") UUID id) {
+    public ResponseEntity<AccountResponseDTO> createAccount(@RequestBody CreateAccountRequestDTO createAccountRequestDTO) {
+        UUID id = createAccountRequestDTO.getId();
         AccountResponseDTO accountResponse = accountService.createAccount(id);
         return new ResponseEntity<>(accountResponse, HttpStatus.CREATED);
     }
