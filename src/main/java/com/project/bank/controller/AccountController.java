@@ -20,7 +20,7 @@ public class AccountController {
 
     @PostMapping
     public ResponseEntity<AccountResponseDTO> createAccount(@RequestBody CreateAccountRequestDTO createAccountRequestDTO) {
-        UUID id = createAccountRequestDTO.getId();
+        UUID id = createAccountRequestDTO.getCustomerId();
         AccountResponseDTO accountResponse = accountService.createAccount(id);
         return new ResponseEntity<>(accountResponse, HttpStatus.CREATED);
     }
