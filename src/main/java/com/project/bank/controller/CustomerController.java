@@ -1,10 +1,8 @@
 package com.project.bank.controller;
 
-import com.project.bank.dto.CustomerIdRequestDTO;
 import com.project.bank.dto.CustomerInfoDTO;
 import com.project.bank.dto.CustomerResponseDTO;
 import com.project.bank.service.CustomerService;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,18 +30,14 @@ public class CustomerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CustomerInfoDTO> updateCustomer(@PathVariable("id") UUID id, @RequestBody CustomerInfoDTO customerInfoDTO) {
-        CustomerIdRequestDTO customerIdRequestDTO = new CustomerIdRequestDTO();
-        customerIdRequestDTO.setId(id);
-        CustomerInfoDTO updatedCustomer = customerService.updateCustomer(customerIdRequestDTO, customerInfoDTO);
+        CustomerInfoDTO updatedCustomer = customerService.updateCustomer(id, customerInfoDTO);
         return ResponseEntity.ok(updatedCustomer);
     }
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable("id") UUID id) {
-        CustomerIdRequestDTO customerIdRequestDTO = new CustomerIdRequestDTO();
-        customerIdRequestDTO.setId(id);
-        customerService.deleteCustomer(customerIdRequestDTO);
+        customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
     }
 }

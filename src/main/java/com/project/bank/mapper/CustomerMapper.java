@@ -1,13 +1,9 @@
 package com.project.bank.mapper;
 
 import com.project.bank.dto.CustomerResponseDTO;
-import com.project.bank.dto.CustomerIdRequestDTO;
 import com.project.bank.dto.CustomerInfoDTO;
 import com.project.bank.model.Customer;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Component
 public class CustomerMapper {
@@ -22,10 +18,6 @@ public class CustomerMapper {
         customerDTO.setAddress(customer.getAddress());
         return customerDTO;
 
-    }
-
-    public UUID fromCustomerIdRequestDtoToCustomerId(CustomerIdRequestDTO customerIdDTO) {
-        return customerIdDTO.getId();
     }
 
     public CustomerInfoDTO fromCustomerToCustomerInfoDto(Customer customer) {

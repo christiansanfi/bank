@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AccountIdRequestDTO {
-    private UUID id;
+public class CreateAccountRequestDTO {
+    private UUID customerId;
 }
