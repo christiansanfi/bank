@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Table(name="customer")
 public class Customer {
     @Id
     private UUID id;
