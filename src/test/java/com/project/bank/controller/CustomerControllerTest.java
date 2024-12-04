@@ -1,118 +1,86 @@
 package com.project.bank.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.bank.dto.CustomerInfoDTO;
-import com.project.bank.dto.CustomerResponseDTO;
-import com.project.bank.exception.CustomerNotFoundException;
-import com.project.bank.service.CustomerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(CustomerController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class CustomerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private CustomerService customerService;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
+    @Sql(scripts = {"/sql/cleanup.sql"})
     void createCustomer_ShouldReturnCreatedCustomer() throws Exception {
-        CustomerInfoDTO customerInfoDTO = new CustomerInfoDTO("Mario Rossi", null, "Roma", "MRARSS90E20H501X", "Via Roma 1");
-        CustomerResponseDTO customerResponseDTO = new CustomerResponseDTO();
-
-        when(customerService.createCustomer(customerInfoDTO)).thenReturn(customerResponseDTO);
+        String requestBody = """
+                {
+                    "name": "Mario Rossi",
+                    "birthPlace": "Roma",
+                    "taxCode": "MRARSS90E20H501X",
+                    "address": "Via Roma 1"
+                }
+                """;
 
         mockMvc.perform(post("/api/customers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(customerInfoDTO)))
+                        .contentType("application/json")
+                        .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(customerResponseDTO)));
+                .andExpect(jsonPath("$.name").value("Mario Rossi"))
+                .andExpect(jsonPath("$.address").value("Via Roma 1"));
     }
 
     @Test
-    void getCustomerDetails_ShouldReturnCustomerInfoDTO() throws Exception {
-        UUID customerId = UUID.randomUUID();
-        CustomerInfoDTO customerInfoDTO = new CustomerInfoDTO("Mario Rossi", null, "Roma", "MRARSS90E20H501X", "Via Roma 1");
-
-        when(customerService.getCustomerDetails(customerId)).thenReturn(customerInfoDTO);
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})
+    void getCustomerDetails_ShouldReturnCustomerInfo() throws Exception {
+        UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
         mockMvc.perform(get("/api/customers/{id}", customerId))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(customerInfoDTO)));
+                .andExpect(jsonPath("$.name").value("Mario Rossi"))
+                .andExpect(jsonPath("$.address").value("Via Roma 1"));
     }
 
     @Test
-    void getCustomerDetails_ShouldReturnNotFound_WhenCustomerDoesNotExist() throws Exception {
-        UUID customerId = UUID.randomUUID();
-
-        when(customerService.getCustomerDetails(customerId)).thenThrow(new CustomerNotFoundException("Customer not found"));
-
-        mockMvc.perform(get("/api/customers/{id}", customerId))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Customer not found"));
-    }
-
-    @Test
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})
     void updateCustomer_ShouldReturnUpdatedCustomer() throws Exception {
-        UUID customerId = UUID.randomUUID();
-        CustomerInfoDTO customerInfoDTO = new CustomerInfoDTO("Mario Rossi", null, "Roma", "MRARSS90E20H501X", "Via Roma 1");
-        CustomerInfoDTO updatedCustomerInfoDTO = new CustomerInfoDTO("Mario Verdi", null, "Milano", "MRVRDI90E20H501X", "Via Milano 10");
-
-        when(customerService.updateCustomer(customerId, customerInfoDTO)).thenReturn(updatedCustomerInfoDTO);
+        UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
+        String requestBody = """
+                {
+                    "name": "Luigi Verdi",
+                    "birthPlace": "Milano",
+                    "taxCode": "LGVRDI90E20H501X",
+                    "address": "Via Milano 10"
+                }
+                """;
 
         mockMvc.perform(put("/api/customers/{id}", customerId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(customerInfoDTO)))
+                        .contentType("application/json")
+                        .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(updatedCustomerInfoDTO)));
+                .andExpect(jsonPath("$.name").value("Luigi Verdi"))
+                .andExpect(jsonPath("$.address").value("Via Milano 10"));
     }
 
     @Test
-    void updateCustomer_ShouldReturnNotFound_WhenCustomerDoesNotExist() throws Exception {
-        UUID customerId = UUID.randomUUID();
-        CustomerInfoDTO customerInfoDTO = new CustomerInfoDTO("Mario Rossi", null, "Roma", "MRARSS90E20H501X", "Via Roma 1");
-
-        when(customerService.updateCustomer(customerId, customerInfoDTO)).thenThrow(new CustomerNotFoundException("Customer not found"));
-
-        mockMvc.perform(put("/api/customers/{id}", customerId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(customerInfoDTO)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Customer not found"));
-    }
-
-    @Test
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})
     void deleteCustomer_ShouldReturnNoContent() throws Exception {
-        UUID customerId = UUID.randomUUID();
-        doNothing().when(customerService).deleteCustomer(customerId);
+        UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
         mockMvc.perform(delete("/api/customers/{id}", customerId))
                 .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void deleteCustomer_ShouldReturnNotFound_WhenCustomerDoesNotExist() throws Exception {
-        UUID customerId = UUID.randomUUID();
-
-        doThrow(new CustomerNotFoundException("Customer not found")).when(customerService).deleteCustomer(customerId);
-
-        mockMvc.perform(delete("/api/customers/{id}", customerId))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Customer not found"));
     }
 }

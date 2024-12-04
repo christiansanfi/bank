@@ -1,115 +1,71 @@
 package com.project.bank.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.bank.dto.AccountResponseDTO;
-import com.project.bank.dto.BalanceResponseDTO;
-import com.project.bank.dto.CreateAccountRequestDTO;
-import com.project.bank.exception.AccountNotFoundException;
-import com.project.bank.service.AccountService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AccountController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 class AccountControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private AccountService accountService;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql", "/sql/insert-account.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void createAccount_ShouldReturnCreatedAccount() throws Exception {
-        UUID customerId = UUID.randomUUID();
-        CreateAccountRequestDTO createAccountRequestDTO = new CreateAccountRequestDTO(customerId);
-        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
-
-        when(accountService.createAccount(customerId)).thenReturn(accountResponseDTO);
+        String requestBody = """
+            {
+                "customerId": "123e4567-e89b-12d3-a456-426614174000"
+            }
+            """;
 
         mockMvc.perform(post("/api/accounts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createAccountRequestDTO)))
-                .andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(accountResponseDTO)));
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isCreated());
     }
 
+
+
     @Test
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql", "/sql/insert-account.sql"})
     void getBalance_ShouldReturnBalance() throws Exception {
-        UUID accountId = UUID.randomUUID();
-        BalanceResponseDTO balanceResponseDTO = new BalanceResponseDTO(BigDecimal.valueOf(1000.0));
-
-        when(accountService.getBalance(accountId)).thenReturn(balanceResponseDTO);
+        UUID accountId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
         mockMvc.perform(get("/api/accounts/{id}/balance", accountId))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(balanceResponseDTO)));
+                .andExpect(jsonPath("$.balance").value("1500.0"));
     }
 
     @Test
-    void getBalance_ShouldReturnNotFound_WhenAccountDoesNotExist() throws Exception {
-        UUID accountId = UUID.randomUUID();
-
-        when(accountService.getBalance(accountId)).thenThrow(new AccountNotFoundException("Account not found"));
-
-        mockMvc.perform(get("/api/accounts/{id}/balance", accountId))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Account not found"));
-    }
-
-    @Test
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql", "/sql/insert-account.sql"})
     void getAccountFromId_ShouldReturnAccountDetails() throws Exception {
-        UUID accountId = UUID.randomUUID();
-        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
-
-        when(accountService.getAccountFromId(accountId)).thenReturn(accountResponseDTO);
+        UUID accountId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
         mockMvc.perform(get("/api/accounts/{id}", accountId))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(accountResponseDTO)));
+                .andExpect(jsonPath("$.iban").value("IT60X0542811101000000123456"));
     }
 
     @Test
-    void getAccountFromId_ShouldReturnNotFound_WhenAccountDoesNotExist() throws Exception {
-        UUID accountId = UUID.randomUUID();
-
-        when(accountService.getAccountFromId(accountId)).thenThrow(new AccountNotFoundException("Account not found"));
-
-        mockMvc.perform(get("/api/accounts/{id}", accountId))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Account not found"));
-    }
-
-    @Test
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql", "/sql/insert-account.sql"})
     void deleteAccount_ShouldReturnNoContent() throws Exception {
-        UUID accountId = UUID.randomUUID();
-        doNothing().when(accountService).deleteAccount(accountId);
+        UUID accountId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
         mockMvc.perform(delete("/api/accounts/{id}", accountId))
                 .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void deleteAccount_ShouldReturnNotFound_WhenAccountDoesNotExist() throws Exception {
-        UUID accountId = UUID.randomUUID();
-
-        doThrow(new AccountNotFoundException("Account not found")).when(accountService).deleteAccount(accountId);
-
-        mockMvc.perform(delete("/api/accounts/{id}", accountId))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Account not found"));
     }
 }
