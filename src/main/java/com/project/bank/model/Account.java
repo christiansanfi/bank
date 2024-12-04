@@ -11,9 +11,9 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name="account")
 public class Account {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private BigDecimal balance;
     @ManyToOne

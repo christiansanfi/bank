@@ -9,13 +9,12 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Entity
 @Getter
 @Setter
-@Table(name="transaction")
 public class Transaction {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     @ManyToOne
     @JoinColumn(name = "account_id")

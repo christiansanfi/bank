@@ -4,89 +4,84 @@ import com.project.bank.model.Account;
 import com.project.bank.model.Transaction;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class TransactionRepositoryTest {
 
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
     @PersistenceContext
     private EntityManager entityManager;
 
+    private Account account;
+
+    @BeforeEach
+    void setUp() {
+        account = new Account();
+        account.setIban("IT60X0542811101000000123456");
+        account.setBalance(BigDecimal.valueOf(1000.0));
+        accountRepository.save(account);
+    }
+
     @Test
     void saveTransaction_ShouldPersistTransaction() {
-        Account account = new Account();
-        account.setId(UUID.randomUUID());
-        account.setIban("IT60X0542811101000000123456");
-        entityManager.persist(account);
-
         Transaction transaction = new Transaction();
-        transaction.setId(UUID.randomUUID());
         transaction.setAccount(account);
         transaction.setAmount(BigDecimal.valueOf(100.0));
         transaction.setType("deposit");
         transaction.setDate(LocalDateTime.now());
 
-        entityManager.persist(transaction);
-        entityManager.flush();
+        transactionRepository.save(transaction);
 
-        Transaction foundTransaction = entityManager.find(Transaction.class, transaction.getId());
-        assertNotNull(foundTransaction);
-        assertEquals(BigDecimal.valueOf(100.0), foundTransaction.getAmount());
+        Transaction persistedTransaction = entityManager.find(Transaction.class, transaction.getId());
+        assertNotNull(persistedTransaction);
+        assertEquals(BigDecimal.valueOf(100.0), persistedTransaction.getAmount());
+        assertEquals("deposit", persistedTransaction.getType());
+        assertEquals(account.getId(), persistedTransaction.getAccount().getId());
     }
 
     @Test
-    void findTransactionsByAccountId_ShouldReturnTransactions() {
-        Account account = new Account();
-        account.setId(UUID.randomUUID());
-        account.setIban("IT60X0542811101000000123456");
-        entityManager.persist(account);
+    void updateTransaction_ShouldUpdateTransactionDetails() {
+        Transaction transaction = new Transaction();
+        transaction.setAccount(account);
+        transaction.setAmount(BigDecimal.valueOf(100.0));
+        transaction.setType("deposit");
+        transaction.setDate(LocalDateTime.now());
+        transactionRepository.save(transaction);
 
-        Transaction transaction1 = new Transaction();
-        transaction1.setId(UUID.randomUUID());
-        transaction1.setAccount(account);
-        transaction1.setAmount(BigDecimal.valueOf(100.0));
-        transaction1.setType("deposit");
-        transaction1.setDate(LocalDateTime.now().minusDays(1));
-        entityManager.persist(transaction1);
+        transaction.setAmount(BigDecimal.valueOf(150.0));
+        transaction.setType("withdraw");
+        transactionRepository.save(transaction);
 
-        Transaction transaction2 = new Transaction();
-        transaction2.setId(UUID.randomUUID());
-        transaction2.setAccount(account);
-        transaction2.setAmount(BigDecimal.valueOf(50.0));
-        transaction2.setType("withdraw");
-        transaction2.setDate(LocalDateTime.now());
-        entityManager.persist(transaction2);
-
-        entityManager.flush();
-
-        List<Transaction> transactions = entityManager
-                .createQuery("SELECT t FROM Transaction t WHERE t.account.id = :accountId", Transaction.class)
-                .setParameter("accountId", account.getId())
-                .getResultList();
-
-        assertEquals(2, transactions.size());
+        Transaction updatedTransaction = entityManager.find(Transaction.class, transaction.getId());
+        assertNotNull(updatedTransaction);
+        assertEquals(BigDecimal.valueOf(150.0), updatedTransaction.getAmount());
+        assertEquals("withdraw", updatedTransaction.getType());
     }
 
     @Test
     void deleteTransaction_ShouldRemoveTransaction() {
         Transaction transaction = new Transaction();
-        transaction.setId(UUID.randomUUID());
+        transaction.setAccount(account);
         transaction.setAmount(BigDecimal.valueOf(100.0));
         transaction.setType("deposit");
         transaction.setDate(LocalDateTime.now());
-        entityManager.persist(transaction);
+        transactionRepository.save(transaction);
 
-        entityManager.remove(transaction);
-        entityManager.flush();
+        transactionRepository.delete(transaction);
 
         Transaction deletedTransaction = entityManager.find(Transaction.class, transaction.getId());
         assertNull(deletedTransaction);

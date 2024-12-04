@@ -4,15 +4,16 @@ import com.project.bank.model.Customer;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class CustomerRepositoryTest {
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -20,43 +21,46 @@ class CustomerRepositoryTest {
     @Test
     void saveCustomer_ShouldPersistCustomer() {
         Customer customer = new Customer();
-        customer.setId(UUID.randomUUID());
         customer.setName("Mario Rossi");
+        customer.setBirthPlace("Roma");
         customer.setTaxCode("MRARSS90E20H501X");
 
-        entityManager.persist(customer);
-        entityManager.flush();
+        customerRepository.save(customer);
 
-        Customer foundCustomer = entityManager.find(Customer.class, customer.getId());
-        assertNotNull(foundCustomer);
-        assertEquals("Mario Rossi", foundCustomer.getName());
+        Customer persistedCustomer = entityManager.find(Customer.class, customer.getId());
+        assertNotNull(persistedCustomer);
+        assertEquals("Mario Rossi", persistedCustomer.getName());
+        assertEquals("Roma", persistedCustomer.getBirthPlace());
+        assertEquals("MRARSS90E20H501X", persistedCustomer.getTaxCode());
     }
 
     @Test
-    void updateCustomer_ShouldChangeAddress() {
+    void updateCustomer_ShouldUpdateCustomerDetails() {
         Customer customer = new Customer();
-        customer.setId(UUID.randomUUID());
         customer.setName("Mario Rossi");
-        customer.setAddress("Via Roma 1");
-        entityManager.persist(customer);
+        customer.setBirthPlace("Roma");
+        customer.setTaxCode("MRARSS90E20H501X");
+        customerRepository.save(customer);
 
-        customer.setAddress("Via Milano 2");
-        entityManager.merge(customer);
-        entityManager.flush();
+        customer.setName("Mario Verdi");
+        customer.setBirthPlace("Milano");
+        customerRepository.save(customer);
 
         Customer updatedCustomer = entityManager.find(Customer.class, customer.getId());
-        assertEquals("Via Milano 2", updatedCustomer.getAddress());
+        assertNotNull(updatedCustomer);
+        assertEquals("Mario Verdi", updatedCustomer.getName());
+        assertEquals("Milano", updatedCustomer.getBirthPlace());
     }
 
     @Test
     void deleteCustomer_ShouldRemoveCustomer() {
         Customer customer = new Customer();
-        customer.setId(UUID.randomUUID());
         customer.setName("Mario Rossi");
-        entityManager.persist(customer);
+        customer.setBirthPlace("Roma");
+        customer.setTaxCode("MRARSS90E20H501X");
+        customerRepository.save(customer);
 
-        entityManager.remove(customer);
-        entityManager.flush();
+        customerRepository.delete(customer);
 
         Customer deletedCustomer = entityManager.find(Customer.class, customer.getId());
         assertNull(deletedCustomer);
