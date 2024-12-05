@@ -15,8 +15,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({NegativeAmountException.class, InsufficientBalanceException.class})
-    public ResponseEntity<String> handleNegativeAmountException(RuntimeException exception) {
+    @ExceptionHandler({InsufficientBalanceException.class})
+    public ResponseEntity<String> handleInsufficientBalanceException(RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
