@@ -42,7 +42,8 @@ class AccountRepositoryTest {
         Account account = new Account();
         account.setIban("IT60X0542811101000000123456");
         account.setBalance(BigDecimal.valueOf(1000.0));
-        accountRepository.save(account);
+        entityManager.persist(account);
+        entityManager.flush();
 
         account.setBalance(BigDecimal.valueOf(1500.0));
 
@@ -60,7 +61,8 @@ class AccountRepositoryTest {
         Account account = new Account();
         account.setIban("IT60X0542811101000000123456");
         account.setBalance(BigDecimal.valueOf(1000.0));
-        accountRepository.save(account);
+        entityManager.persist(account);
+        entityManager.flush();
 
         accountRepository.delete(account);
 

@@ -33,7 +33,8 @@ class TransactionRepositoryTest {
         account = new Account();
         account.setIban("IT60X0542811101000000123456");
         account.setBalance(BigDecimal.valueOf(1000.0));
-        accountRepository.save(account);
+        entityManager.persist(account);
+        entityManager.flush();
     }
 
     @Test
@@ -60,7 +61,8 @@ class TransactionRepositoryTest {
         transaction.setAmount(BigDecimal.valueOf(100.0));
         transaction.setType("deposit");
         transaction.setDate(LocalDateTime.now());
-        transactionRepository.save(transaction);
+        entityManager.persist(transaction);
+        entityManager.flush();
 
         transaction.setAmount(BigDecimal.valueOf(150.0));
         transaction.setType("withdraw");
@@ -79,7 +81,8 @@ class TransactionRepositoryTest {
         transaction.setAmount(BigDecimal.valueOf(100.0));
         transaction.setType("deposit");
         transaction.setDate(LocalDateTime.now());
-        transactionRepository.save(transaction);
+        entityManager.persist(transaction);
+        entityManager.flush();
 
         transactionRepository.delete(transaction);
 

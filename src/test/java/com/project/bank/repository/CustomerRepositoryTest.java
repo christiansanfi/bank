@@ -40,7 +40,8 @@ class CustomerRepositoryTest {
         customer.setName("Mario Rossi");
         customer.setBirthPlace("Roma");
         customer.setTaxCode("MRARSS90E20H501X");
-        customerRepository.save(customer);
+        entityManager.persist(customer);
+        entityManager.flush();
 
         customer.setName("Mario Verdi");
         customer.setBirthPlace("Milano");
@@ -58,7 +59,8 @@ class CustomerRepositoryTest {
         customer.setName("Mario Rossi");
         customer.setBirthPlace("Roma");
         customer.setTaxCode("MRARSS90E20H501X");
-        customerRepository.save(customer);
+        entityManager.persist(customer);
+        entityManager.flush();
 
         customerRepository.delete(customer);
 
