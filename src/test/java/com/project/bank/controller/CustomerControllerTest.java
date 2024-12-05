@@ -1,6 +1,7 @@
 package com.project.bank.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.bank.dto.CustomerInfoDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,18 +27,16 @@ class CustomerControllerTest {
     @Test
     @Sql(scripts = {"/sql/cleanup.sql"})
     void createCustomer_ShouldReturnCreatedCustomer() throws Exception {
-        String requestBody = """
-                {
-                    "name": "Mario Rossi",
-                    "birthPlace": "Roma",
-                    "taxCode": "MRARSS90E20H501X",
-                    "address": "Via Roma 1"
-                }
-                """;
+        CustomerInfoDTO customerInfoDTO = CustomerInfoDTO.builder()
+                .name("Mario Rossi")
+                .birthPlace("Roma")
+                .taxCode("MRARSS90E20H501X")
+                .address("Via Roma 1")
+                .build();
 
         mockMvc.perform(post("/api/customers")
                         .contentType("application/json")
-                        .content(requestBody))
+                        .content(objectMapper.writeValueAsString(customerInfoDTO))) // Serializza il DTO in JSON
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Mario Rossi"))
                 .andExpect(jsonPath("$.address").value("Via Roma 1"));
@@ -58,22 +57,21 @@ class CustomerControllerTest {
     @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})
     void updateCustomer_ShouldReturnUpdatedCustomer() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
-        String requestBody = """
-                {
-                    "name": "Luigi Verdi",
-                    "birthPlace": "Milano",
-                    "taxCode": "LGVRDI90E20H501X",
-                    "address": "Via Milano 10"
-                }
-                """;
+        CustomerInfoDTO updatedCustomerInfoDTO = CustomerInfoDTO.builder()
+                .name("Luigi Verdi")
+                .birthPlace("Milano")
+                .taxCode("LGVRDI90E20H501X")
+                .address("Via Milano 10")
+                .build();
 
         mockMvc.perform(put("/api/customers/{id}", customerId)
                         .contentType("application/json")
-                        .content(requestBody))
+                        .content(objectMapper.writeValueAsString(updatedCustomerInfoDTO))) // Serializza il DTO in JSON
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Luigi Verdi"))
                 .andExpect(jsonPath("$.address").value("Via Milano 10"));
     }
+
 
     @Test
     @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})

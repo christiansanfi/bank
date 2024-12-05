@@ -1,6 +1,7 @@
 package com.project.bank.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.bank.dto.CreateAccountRequestDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,19 +27,13 @@ class AccountControllerTest {
     @Test
     @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql", "/sql/insert-account.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     void createAccount_ShouldReturnCreatedAccount() throws Exception {
-        String requestBody = """
-            {
-                "customerId": "123e4567-e89b-12d3-a456-426614174000"
-            }
-            """;
+        CreateAccountRequestDTO requestDTO = new CreateAccountRequestDTO(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
 
         mockMvc.perform(post("/api/accounts")
                         .contentType("application/json")
-                        .content(requestBody))
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated());
     }
-
-
 
     @Test
     @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql", "/sql/insert-account.sql"})

@@ -1,6 +1,7 @@
 package com.project.bank.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.bank.dto.TransactionRequestDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -8,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -26,32 +28,28 @@ class TransactionControllerTest {
     @Test
     @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql", "/sql/insert-account.sql"})
     void deposit_ShouldReturnTransactionResponse() throws Exception {
-        String requestBody = """
-                {
-                    "accountId": "123e4567-e89b-12d3-a456-426614174000",
-                    "amount": 100.00
-                }
-                """;
+        TransactionRequestDTO requestDTO = new TransactionRequestDTO(
+                UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
+                BigDecimal.valueOf(100.00)
+        );
 
         mockMvc.perform(post("/api/transactions/deposit")
                         .contentType("application/json")
-                        .content(requestBody))
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk());
     }
 
     @Test
     @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql", "/sql/insert-account.sql"})
     void withdraw_ShouldReturnTransactionResponse() throws Exception {
-        String requestBody = """
-                {
-                    "accountId": "123e4567-e89b-12d3-a456-426614174000",
-                    "amount": 50.00
-                }
-                """;
+        TransactionRequestDTO requestDTO = new TransactionRequestDTO(
+                UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
+                BigDecimal.valueOf(50.00)
+        );
 
         mockMvc.perform(post("/api/transactions/withdraw")
                         .contentType("application/json")
-                        .content(requestBody))
+                        .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk());
     }
 
