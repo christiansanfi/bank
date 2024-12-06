@@ -2,6 +2,7 @@ package com.project.bank.controller;
 
 import com.project.bank.dto.TransactionResponseDTO;
 import com.project.bank.dto.TransactionRequestDTO;
+import com.project.bank.model.TransactionType;
 import com.project.bank.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +20,13 @@ public class TransactionController {
 
     @PostMapping("/deposit")
     public ResponseEntity<TransactionResponseDTO> deposit(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO) {
-        TransactionResponseDTO transactionResponseDTO = transactionService.deposit(transactionRequestDTO);
+        TransactionResponseDTO transactionResponseDTO = transactionService.deposit(transactionRequestDTO, TransactionType.DEPOSIT);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/withdraw")
     public ResponseEntity<TransactionResponseDTO> withdraw(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO) {
-        TransactionResponseDTO transactionResponseDTO = transactionService.withdraw(transactionRequestDTO);
+        TransactionResponseDTO transactionResponseDTO = transactionService.withdraw(transactionRequestDTO, TransactionType.DEPOSIT);
         return ResponseEntity.ok().build();
     }
 
