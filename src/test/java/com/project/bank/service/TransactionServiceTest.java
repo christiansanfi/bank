@@ -8,6 +8,7 @@ import com.project.bank.exception.TransactionNotFoundException;
 import com.project.bank.mapper.TransactionMapper;
 import com.project.bank.model.Account;
 import com.project.bank.model.Transaction;
+import com.project.bank.model.TransactionType;
 import com.project.bank.repository.AccountRepository;
 import com.project.bank.repository.TransactionRepository;
 import org.junit.jupiter.api.Test;
@@ -51,13 +52,13 @@ class TransactionServiceTest {
         TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
 
         when(accountRepository.getReferenceById(accountId)).thenReturn(account);
-        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, "deposit", account)).thenReturn(transaction);
+        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, TransactionType.DEPOSIT, account)).thenReturn(transaction);
         when(transactionRepository.save(transaction)).thenReturn(transaction);
         when(accountRepository.save(account)).thenReturn(account);
         when(transactionMapper.fromTransactionToGetTransactionResponseDto(transaction)).thenReturn(expectedResponse);
 
         // Act
-        TransactionResponseDTO actualResponse = transactionService.deposit(transactionRequestDTO);
+        TransactionResponseDTO actualResponse = transactionService.deposit(transactionRequestDTO, TransactionType.DEPOSIT);
 
         // Assert
         assertEquals(expectedResponse, actualResponse);
@@ -77,13 +78,13 @@ class TransactionServiceTest {
         TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
 
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, "withdraw", account)).thenReturn(transaction);
+        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, TransactionType.WITHDRAW, account)).thenReturn(transaction);
         when(transactionRepository.save(transaction)).thenReturn(transaction);
         when(accountRepository.save(account)).thenReturn(account);
         when(transactionMapper.fromTransactionToGetTransactionResponseDto(transaction)).thenReturn(expectedResponse);
 
         // Act
-        TransactionResponseDTO actualResponse = transactionService.withdraw(transactionRequestDTO);
+        TransactionResponseDTO actualResponse = transactionService.withdraw(transactionRequestDTO, TransactionType.WITHDRAW);
 
         // Assert
         assertEquals(expectedResponse, actualResponse);
@@ -103,7 +104,7 @@ class TransactionServiceTest {
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
 
         // Act & Assert
-        assertThrows(InsufficientBalanceException.class, () -> transactionService.withdraw(transactionRequestDTO));
+        assertThrows(InsufficientBalanceException.class, () -> transactionService.withdraw(transactionRequestDTO, TransactionType.WITHDRAW));
         verify(accountRepository).findById(accountId);
     }
 
