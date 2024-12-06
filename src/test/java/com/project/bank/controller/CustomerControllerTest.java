@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class CustomerControllerTest {
 
     @Autowired
@@ -25,7 +26,6 @@ class CustomerControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @Sql(scripts = {"/sql/cleanup.sql"})
     void createCustomer_ShouldReturnCreatedCustomer() throws Exception {
         CustomerInfoDTO customerInfoDTO = CustomerInfoDTO.builder()
                 .name("Mario Rossi")
@@ -36,14 +36,13 @@ class CustomerControllerTest {
 
         mockMvc.perform(post("/api/customers")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(customerInfoDTO))) // Serializza il DTO in JSON
+                        .content(objectMapper.writeValueAsString(customerInfoDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Mario Rossi"))
                 .andExpect(jsonPath("$.address").value("Via Roma 1"));
     }
 
     @Test
-    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})
     void getCustomerDetails_ShouldReturnCustomerInfo() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
@@ -54,7 +53,6 @@ class CustomerControllerTest {
     }
 
     @Test
-    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})
     void updateCustomer_ShouldReturnUpdatedCustomer() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
         CustomerInfoDTO updatedCustomerInfoDTO = CustomerInfoDTO.builder()
@@ -66,15 +64,13 @@ class CustomerControllerTest {
 
         mockMvc.perform(put("/api/customers/{id}", customerId)
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(updatedCustomerInfoDTO))) // Serializza il DTO in JSON
+                        .content(objectMapper.writeValueAsString(updatedCustomerInfoDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Luigi Verdi"))
                 .andExpect(jsonPath("$.address").value("Via Milano 10"));
     }
 
-
     @Test
-    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})
     void deleteCustomer_ShouldReturnNoContent() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
