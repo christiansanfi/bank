@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -17,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Sql(scripts = {"/sql/cleanup.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class CustomerControllerTest {
 
     @Autowired
@@ -27,7 +26,6 @@ class CustomerControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void createCustomer_ShouldReturnCreatedCustomer() throws Exception {
         CustomerInfoDTO customerInfoDTO = CustomerInfoDTO.builder()
                 .name("Mario Rossi")
@@ -45,8 +43,6 @@ class CustomerControllerTest {
     }
 
     @Test
-    @Sql(scripts = {"/sql/insert-customer.sql"})
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void getCustomerDetails_ShouldReturnCustomerInfo() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
@@ -57,8 +53,6 @@ class CustomerControllerTest {
     }
 
     @Test
-    @Sql(scripts = {"/sql/insert-customer.sql"})
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void updateCustomer_ShouldReturnUpdatedCustomer() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
         CustomerInfoDTO updatedCustomerInfoDTO = CustomerInfoDTO.builder()
@@ -77,8 +71,6 @@ class CustomerControllerTest {
     }
 
     @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    @Sql(scripts = {"/sql/insert-customer.sql"})
     void deleteCustomer_ShouldReturnNoContent() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
