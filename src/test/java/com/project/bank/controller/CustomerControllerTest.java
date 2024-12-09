@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CustomerControllerTest {
 
     @Autowired
@@ -43,6 +45,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @Sql(scripts = {"/sql/insert-customer.sql"})
     void getCustomerDetails_ShouldReturnCustomerInfo() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
@@ -53,6 +56,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @Sql(scripts = {"/sql/insert-customer.sql"})
     void updateCustomer_ShouldReturnUpdatedCustomer() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
         CustomerInfoDTO updatedCustomerInfoDTO = CustomerInfoDTO.builder()
@@ -71,6 +75,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})
     void deleteCustomer_ShouldReturnNoContent() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
