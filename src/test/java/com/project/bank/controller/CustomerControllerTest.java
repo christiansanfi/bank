@@ -75,11 +75,32 @@ class CustomerControllerTest {
     }
 
     @Test
-    @Sql(scripts = {"/sql/cleanup.sql", "/sql/insert-customer.sql"})
+    @Sql(scripts = {"/sql/insert-customer.sql"})
     void deleteCustomer_ShouldReturnNoContent() throws Exception {
         UUID customerId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
         mockMvc.perform(delete("/api/customers/{id}", customerId))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    void getCustomerDetails_ShouldReturnNotFound_WhenCustomerDoesNotExist() throws Exception {
+        UUID nonExistentCustomerId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+
+        mockMvc.perform(get("/api/customers/{id}", nonExistentCustomerId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Customer with ID: " + nonExistentCustomerId + " not found"));
+    }
+
+    @Test
+    void createCustomer_ShouldReturnBadRequest_WhenValidationFails() throws Exception {
+        CustomerInfoDTO invalidCustomerInfo = CustomerInfoDTO.builder().build();
+
+        mockMvc.perform(post("/api/customers")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(invalidCustomerInfo)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("name cannot be null"));
+    }
+
 }

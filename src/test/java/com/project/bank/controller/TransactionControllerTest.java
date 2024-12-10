@@ -29,7 +29,6 @@ class TransactionControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @Sql(scripts = {"/sql/insert-customer.sql", "/sql/insert-account.sql"})
     void deposit_ShouldReturnTransactionResponse() throws Exception {
         TransactionRequestDTO requestDTO = new TransactionRequestDTO(
                 UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
@@ -43,7 +42,6 @@ class TransactionControllerTest {
     }
 
     @Test
-    @Sql(scripts = {"/sql/insert-customer.sql", "/sql/insert-account.sql"})
     void withdraw_ShouldReturnTransactionResponse() throws Exception {
         TransactionRequestDTO requestDTO = new TransactionRequestDTO(
                 UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
@@ -57,7 +55,6 @@ class TransactionControllerTest {
     }
 
     @Test
-    @Sql(scripts = {"/sql/insert-customer.sql", "/sql/insert-account.sql", "/sql/insert-transaction.sql"})
     void getLastFiveTransactions_ShouldReturnTransactions() throws Exception {
         UUID accountId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
 
@@ -67,11 +64,35 @@ class TransactionControllerTest {
     }
 
     @Test
-    @Sql(scripts = {"/sql/insert-customer.sql", "/sql/insert-account.sql", "/sql/insert-transaction.sql"})
     void deleteTransaction_ShouldReturnNoContent() throws Exception {
         UUID transactionId = UUID.fromString("223e4567-e89b-12d3-a456-426614174000");
 
         mockMvc.perform(delete("/api/transactions/{id}", transactionId))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    void getLastFiveTransactions_ShouldReturnNotFound_WhenAccountDoesNotExist() throws Exception {
+        UUID invalidAccountId = UUID.fromString("111e4567-e89b-12d3-a456-426614174999");
+
+        mockMvc.perform(get("/api/transactions/last-five/{accountId}", invalidAccountId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Transactions not found for account id: " + invalidAccountId));
+    }
+
+    @Test
+    void withdraw_ShouldReturnBadRequest_WhenBalanceIsInsufficient() throws Exception {
+        TransactionRequestDTO requestDTO = new TransactionRequestDTO(
+                UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
+                BigDecimal.valueOf(10000.00) // Importo superiore al saldo disponibile
+        );
+
+        mockMvc.perform(post("/api/transactions/withdraw")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Balance is not sufficient to cover the withdraw"));
+    }
+
+
 }

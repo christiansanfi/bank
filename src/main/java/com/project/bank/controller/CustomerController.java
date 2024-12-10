@@ -3,6 +3,7 @@ package com.project.bank.controller;
 import com.project.bank.dto.CustomerInfoDTO;
 import com.project.bank.dto.CustomerResponseDTO;
 import com.project.bank.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping
-    public ResponseEntity<CustomerResponseDTO> createCustomer(@RequestBody CustomerInfoDTO customerInfoDTO) {
+    public ResponseEntity<CustomerResponseDTO> createCustomer(@Valid @RequestBody CustomerInfoDTO customerInfoDTO) {
         CustomerResponseDTO createdCustomer = customerService.createCustomer(customerInfoDTO);
         return ResponseEntity.ok(createdCustomer);
     }

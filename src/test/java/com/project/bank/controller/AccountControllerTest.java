@@ -58,4 +58,14 @@ class AccountControllerTest {
         mockMvc.perform(delete("/api/accounts/{id}", accountId))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    void getAccountFromId_ShouldReturnNotFound_WhenAccountDoesNotExist() throws Exception {
+        UUID invalidAccountId = UUID.fromString("111e4567-e89b-12d3-a456-426614174999");
+
+        mockMvc.perform(get("/api/accounts/{id}", invalidAccountId))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Account with id " + invalidAccountId + " not found"));
+    }
+
 }
