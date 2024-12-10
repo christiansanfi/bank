@@ -18,17 +18,12 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    @PostMapping("/deposit")
-    public ResponseEntity<TransactionResponseDTO> deposit(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO) {
-        TransactionResponseDTO transactionResponseDTO = transactionService.deposit(transactionRequestDTO, TransactionType.DEPOSIT);
+    @PostMapping
+    public ResponseEntity<TransactionResponseDTO> makeTransaction(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO, @RequestParam("type") TransactionType type) {
+        TransactionResponseDTO transactionResponseDTO = transactionService.makeTransaction(transactionRequestDTO, type);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/withdraw")
-    public ResponseEntity<TransactionResponseDTO> withdraw(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO) {
-        TransactionResponseDTO transactionResponseDTO = transactionService.withdraw(transactionRequestDTO, TransactionType.DEPOSIT);
-        return ResponseEntity.ok().build();
-    }
 
     @GetMapping("/last-five/{accountId}")
     public ResponseEntity<List<TransactionResponseDTO>> getLastFiveTransactions(@PathVariable UUID accountId) {
