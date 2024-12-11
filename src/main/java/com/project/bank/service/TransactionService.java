@@ -56,6 +56,9 @@ public class TransactionService {
     public List<TransactionResponseDTO> getLastFiveTransactions(UUID accountId) {
 
         List<Transaction> transactions = transactionRepository.findByAccountId(accountId);
+        if (transactions.isEmpty()) {
+            throw new TransactionNotFoundException("Transactions not found for account id: " + accountId);
+        }
         return transactions.stream()
                 .sorted(Comparator.comparing(Transaction::getDate).reversed())
                 .limit(5)
