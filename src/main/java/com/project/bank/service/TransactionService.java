@@ -6,6 +6,7 @@ import com.project.bank.exception.*;
 import com.project.bank.mapper.TransactionMapper;
 import com.project.bank.model.Account;
 import com.project.bank.model.Transaction;
+import com.project.bank.model.TransactionType;
 import com.project.bank.repository.AccountRepository;
 import com.project.bank.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,34 +25,26 @@ public class TransactionService {
     public final TransactionMapper transactionMapper;
     public final AccountRepository accountRepository;
 
-
-    public TransactionResponseDTO deposit(TransactionRequestDTO transactionRequestDTO) {
-        UUID id = transactionRequestDTO.getAccountId();
-        Account account = accountRepository.getReferenceById(id);
-        Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, "deposit", account);
-        transaction = transactionRepository.save(transaction);
-        updateBalance(account, transactionRequestDTO.getAmount());
-        account = accountRepository.save(account);
-        return transactionMapper.fromTransactionToGetTransactionResponseDto(transaction);
-    }
-
-    public TransactionResponseDTO withdraw(TransactionRequestDTO transactionRequestDTO) {
-
+    public TransactionResponseDTO makeTransaction(TransactionRequestDTO transactionRequestDTO, TransactionType type){
         UUID id = transactionRequestDTO.getAccountId();
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account with id: " + id + " not found"));
-
-        if (!isBalanceSufficient(account.getBalance(), transactionRequestDTO.getAmount())) {
-            throw new InsufficientBalanceException("Balance is not sufficient to cover the withdraw");
+        Transaction transaction = new Transaction();
+        if(type==TransactionType.DEPOSIT){
+            transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, TransactionType.DEPOSIT, account);
+            transaction = transactionRepository.save(transaction);
+            updateBalance(account, transactionRequestDTO.getAmount());
+        } else if (type==TransactionType.WITHDRAW){
+            if (!isBalanceSufficient(account.getBalance(), transactionRequestDTO.getAmount())) {
+                throw new InsufficientBalanceException("Balance is not sufficient to cover the withdraw");
+            }
+            transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, TransactionType.WITHDRAW, account);
+            transaction = transactionRepository.save(transaction);
+            updateBalance(account, transactionRequestDTO.getAmount().negate());
         }
-
-        Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, "withdraw", account);
-        transaction = transactionRepository.save(transaction);
-        updateBalance(account, transactionRequestDTO.getAmount().negate());
         account = accountRepository.save(account);
         return transactionMapper.fromTransactionToGetTransactionResponseDto(transaction);
     }
-
 
     public List<TransactionResponseDTO> getLastFiveTransactions(UUID accountId) {
 
