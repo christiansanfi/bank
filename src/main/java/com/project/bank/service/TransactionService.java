@@ -29,20 +29,17 @@ public class TransactionService {
         UUID id = transactionRequestDTO.getAccountId();
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account with id: " + id + " not found"));
-        Transaction transaction = new Transaction();
-        if(type==TransactionType.DEPOSIT){
-            transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, TransactionType.DEPOSIT, account);
-            transaction = transactionRepository.save(transaction);
-            updateBalance(account, transactionRequestDTO.getAmount());
-        } else if (type==TransactionType.WITHDRAW){
-            if (!isBalanceSufficient(account.getBalance(), transactionRequestDTO.getAmount())) {
-                throw new InsufficientBalanceException("Balance is not sufficient to cover the withdraw");
-            }
-            transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, TransactionType.WITHDRAW, account);
-            transaction = transactionRepository.save(transaction);
-            updateBalance(account, transactionRequestDTO.getAmount().negate());
+
+        BigDecimal transactionAmount = transactionRequestDTO.getAmount();
+        if (type == TransactionType.WITHDRAW){
+            validateTransaction(account.getBalance(),transactionAmount);
         }
-        account = accountRepository.save(account);
+
+        Transaction transaction = createAndSaveTransaction(transactionRequestDTO, type, account);
+
+        BigDecimal transactionAmountChanged = (type == TransactionType.DEPOSIT) ? transactionAmount : transactionAmount.negate();
+        updateAndSaveAccountBalance(account, transactionAmountChanged);
+
         return transactionMapper.fromTransactionToGetTransactionResponseDto(transaction);
     }
 
@@ -81,6 +78,23 @@ public class TransactionService {
 
     private boolean isBalanceSufficient(BigDecimal accountBalance, BigDecimal withdrawAmount) {
         return accountBalance.compareTo(withdrawAmount) >= 0;
+    }
+
+    private void validateTransaction(BigDecimal balance, BigDecimal transactionAmount){
+        if (!isBalanceSufficient(balance, transactionAmount)){
+            throw new InsufficientBalanceException("Balance is not sufficient");
+        }
+    }
+
+    private Transaction createAndSaveTransaction(TransactionRequestDTO transactionRequestDTO, TransactionType type, Account account) {
+        Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, type, account);
+        return transactionRepository.save(transaction);
+    }
+
+    private void updateAndSaveAccountBalance(Account account, BigDecimal amount) {
+        BigDecimal newBalance = account.getBalance().add(amount);
+        account.setBalance(newBalance);
+        accountRepository.save(account);
     }
 }
 
