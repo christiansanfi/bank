@@ -2,7 +2,6 @@ package com.project.bank.controller;
 
 import com.project.bank.dto.TransactionResponseDTO;
 import com.project.bank.dto.TransactionRequestDTO;
-import com.project.bank.model.TransactionType;
 import com.project.bank.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,8 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping
-    public ResponseEntity<TransactionResponseDTO> makeTransaction(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO, @RequestParam("type") TransactionType type) {
-        TransactionResponseDTO transactionResponseDTO = transactionService.makeTransaction(transactionRequestDTO, type);
+    public ResponseEntity<TransactionResponseDTO> makeTransaction(@Valid @RequestBody TransactionRequestDTO transactionRequestDTO) {
+        TransactionResponseDTO transactionResponseDTO = transactionService.makeTransaction(transactionRequestDTO);
         return ResponseEntity.ok().build();
     }
 

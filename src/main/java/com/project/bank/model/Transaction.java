@@ -1,7 +1,5 @@
 package com.project.bank.model;
 
-import com.project.bank.model.TransactionType;
-
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -23,6 +21,11 @@ public class Transaction {
     private Account account;
     private BigDecimal amount;
     @Enumerated(EnumType.STRING)
-    private TransactionType type;
+    private Type type;
     private LocalDateTime date;
+
+    public enum Type {
+        DEPOSIT,
+        WITHDRAW
+    }
 }

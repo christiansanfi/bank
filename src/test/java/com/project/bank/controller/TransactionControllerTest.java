@@ -2,7 +2,7 @@ package com.project.bank.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.bank.dto.TransactionRequestDTO;
-import com.project.bank.model.TransactionType;
+import com.project.bank.model.Transaction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,11 +33,11 @@ class TransactionControllerTest {
     void makeTransaction_ShouldReturnTransactionResponse_WhenDeposit() throws Exception {
         TransactionRequestDTO requestDTO = new TransactionRequestDTO(
                 UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
-                BigDecimal.valueOf(100.00)
+                BigDecimal.valueOf(100.00),
+                Transaction.Type.DEPOSIT
         );
 
         mockMvc.perform(post("/api/transactions")
-                        .param("type", TransactionType.DEPOSIT.name())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk());
@@ -47,11 +47,11 @@ class TransactionControllerTest {
     void makeTransaction_ShouldReturnTransactionResponse_WhenWithdraw() throws Exception {
         TransactionRequestDTO requestDTO = new TransactionRequestDTO(
                 UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
-                BigDecimal.valueOf(50.00)
+                BigDecimal.valueOf(50.00),
+                Transaction.Type.WITHDRAW
         );
 
         mockMvc.perform(post("/api/transactions")
-                        .param("type", TransactionType.WITHDRAW.name())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk());
@@ -87,11 +87,11 @@ class TransactionControllerTest {
     void makeTransaction_ShouldReturnBadRequest_WhenBalanceIsInsufficient() throws Exception {
         TransactionRequestDTO requestDTO = new TransactionRequestDTO(
                 UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
-                BigDecimal.valueOf(10000.00)
+                BigDecimal.valueOf(10000.00),
+                Transaction.Type.WITHDRAW
         );
 
         mockMvc.perform(post("/api/transactions")
-                        .param("type", TransactionType.WITHDRAW.name())
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())

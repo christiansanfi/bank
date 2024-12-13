@@ -6,7 +6,6 @@ import com.project.bank.exception.*;
 import com.project.bank.mapper.TransactionMapper;
 import com.project.bank.model.Account;
 import com.project.bank.model.Transaction;
-import com.project.bank.model.TransactionType;
 import com.project.bank.repository.AccountRepository;
 import com.project.bank.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,19 +24,19 @@ public class TransactionService {
     public final TransactionMapper transactionMapper;
     public final AccountRepository accountRepository;
 
-    public TransactionResponseDTO makeTransaction(TransactionRequestDTO transactionRequestDTO, TransactionType type){
+    public TransactionResponseDTO makeTransaction(TransactionRequestDTO transactionRequestDTO){
         UUID id = transactionRequestDTO.getAccountId();
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account with id: " + id + " not found"));
 
         BigDecimal transactionAmount = transactionRequestDTO.getAmount();
-        if (type == TransactionType.WITHDRAW){
+        if (transactionRequestDTO.getType() == Transaction.Type.WITHDRAW){
             validateTransaction(account.getBalance(),transactionAmount);
         }
 
-        Transaction transaction = createAndSaveTransaction(transactionRequestDTO, type, account);
+        Transaction transaction = createAndSaveTransaction(transactionRequestDTO, account);
 
-        BigDecimal transactionAmountChanged = (type == TransactionType.DEPOSIT) ? transactionAmount : transactionAmount.negate();
+        BigDecimal transactionAmountChanged = (transactionRequestDTO.getType() == Transaction.Type.DEPOSIT) ? transactionAmount : transactionAmount.negate();
         updateAndSaveAccountBalance(account, transactionAmountChanged);
 
         return transactionMapper.fromTransactionToGetTransactionResponseDto(transaction);
@@ -86,8 +85,8 @@ public class TransactionService {
         }
     }
 
-    private Transaction createAndSaveTransaction(TransactionRequestDTO transactionRequestDTO, TransactionType type, Account account) {
-        Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, type, account);
+    private Transaction createAndSaveTransaction(TransactionRequestDTO transactionRequestDTO, Account account) {
+        Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, account);
         return transactionRepository.save(transaction);
     }
 

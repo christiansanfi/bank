@@ -2,7 +2,6 @@ package com.project.bank.repository;
 
 import com.project.bank.model.Account;
 import com.project.bank.model.Transaction;
-import com.project.bank.model.TransactionType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +42,7 @@ class TransactionRepositoryTest {
         Transaction transaction = new Transaction();
         transaction.setAccount(account);
         transaction.setAmount(BigDecimal.valueOf(100.0));
-        transaction.setType(TransactionType.DEPOSIT);
+        transaction.setType(Transaction.Type.DEPOSIT);
         transaction.setDate(LocalDateTime.now());
 
         transactionRepository.save(transaction);
@@ -51,7 +50,7 @@ class TransactionRepositoryTest {
         Transaction persistedTransaction = entityManager.find(Transaction.class, transaction.getId());
         assertNotNull(persistedTransaction);
         assertEquals(BigDecimal.valueOf(100.0), persistedTransaction.getAmount());
-        assertEquals(TransactionType.DEPOSIT, persistedTransaction.getType());
+        assertEquals(Transaction.Type.DEPOSIT, persistedTransaction.getType());
         assertEquals(account.getId(), persistedTransaction.getAccount().getId());
     }
 
@@ -60,19 +59,19 @@ class TransactionRepositoryTest {
         Transaction transaction = new Transaction();
         transaction.setAccount(account);
         transaction.setAmount(BigDecimal.valueOf(100.0));
-        transaction.setType(TransactionType.DEPOSIT);
+        transaction.setType(Transaction.Type.DEPOSIT);
         transaction.setDate(LocalDateTime.now());
         entityManager.persist(transaction);
         entityManager.flush();
 
         transaction.setAmount(BigDecimal.valueOf(150.0));
-        transaction.setType(TransactionType.WITHDRAW);
+        transaction.setType(Transaction.Type.WITHDRAW);
         transactionRepository.save(transaction);
 
         Transaction updatedTransaction = entityManager.find(Transaction.class, transaction.getId());
         assertNotNull(updatedTransaction);
         assertEquals(BigDecimal.valueOf(150.0), updatedTransaction.getAmount());
-        assertEquals(TransactionType.WITHDRAW, updatedTransaction.getType());
+        assertEquals(Transaction.Type.WITHDRAW, updatedTransaction.getType());
     }
 
     @Test
@@ -80,7 +79,7 @@ class TransactionRepositoryTest {
         Transaction transaction = new Transaction();
         transaction.setAccount(account);
         transaction.setAmount(BigDecimal.valueOf(100.0));
-        transaction.setType(TransactionType.DEPOSIT);
+        transaction.setType(Transaction.Type.DEPOSIT);
         transaction.setDate(LocalDateTime.now());
         entityManager.persist(transaction);
         entityManager.flush();

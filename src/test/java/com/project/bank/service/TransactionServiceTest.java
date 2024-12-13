@@ -2,13 +2,11 @@ package com.project.bank.service;
 
 import com.project.bank.dto.TransactionRequestDTO;
 import com.project.bank.dto.TransactionResponseDTO;
-import com.project.bank.exception.AccountNotFoundException;
 import com.project.bank.exception.InsufficientBalanceException;
 import com.project.bank.exception.TransactionNotFoundException;
 import com.project.bank.mapper.TransactionMapper;
 import com.project.bank.model.Account;
 import com.project.bank.model.Transaction;
-import com.project.bank.model.TransactionType;
 import com.project.bank.repository.AccountRepository;
 import com.project.bank.repository.TransactionRepository;
 import org.junit.jupiter.api.Test;
@@ -43,19 +41,19 @@ class TransactionServiceTest {
     @Test
     void makeTransaction_ShouldReturnTransactionResponseDTO_WhenDeposit() {
         UUID accountId = UUID.randomUUID();
-        TransactionRequestDTO requestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(100));
+        TransactionRequestDTO requestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(100), Transaction.Type.DEPOSIT);
         Account account = new Account();
         account.setBalance(BigDecimal.valueOf(500));
         Transaction transaction = new Transaction();
         TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
 
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(requestDTO, TransactionType.DEPOSIT, account)).thenReturn(transaction);
+        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(requestDTO, account)).thenReturn(transaction);
         when(transactionRepository.save(transaction)).thenReturn(transaction);
         when(accountRepository.save(account)).thenReturn(account);
         when(transactionMapper.fromTransactionToGetTransactionResponseDto(transaction)).thenReturn(expectedResponse);
 
-        TransactionResponseDTO actualResponse = transactionService.makeTransaction(requestDTO, TransactionType.DEPOSIT);
+        TransactionResponseDTO actualResponse = transactionService.makeTransaction(requestDTO);
 
         assertEquals(expectedResponse, actualResponse);
         verify(transactionRepository).save(transaction);
@@ -65,19 +63,19 @@ class TransactionServiceTest {
     @Test
     void makeTransaction_ShouldReturnTransactionResponseDTO_WhenWithdraw() {
         UUID accountId = UUID.randomUUID();
-        TransactionRequestDTO requestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(100));
+        TransactionRequestDTO requestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(100), Transaction.Type.WITHDRAW);
         Account account = new Account();
         account.setBalance(BigDecimal.valueOf(500));
         Transaction transaction = new Transaction();
         TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
 
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(requestDTO, TransactionType.WITHDRAW, account)).thenReturn(transaction);
+        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(requestDTO, account)).thenReturn(transaction);
         when(transactionRepository.save(transaction)).thenReturn(transaction);
         when(accountRepository.save(account)).thenReturn(account);
         when(transactionMapper.fromTransactionToGetTransactionResponseDto(transaction)).thenReturn(expectedResponse);
 
-        TransactionResponseDTO actualResponse = transactionService.makeTransaction(requestDTO, TransactionType.WITHDRAW);
+        TransactionResponseDTO actualResponse = transactionService.makeTransaction(requestDTO);
 
         assertEquals(expectedResponse, actualResponse);
         verify(transactionRepository).save(transaction);
@@ -87,14 +85,14 @@ class TransactionServiceTest {
     @Test
     void makeTransaction_ShouldThrowException_WhenBalanceIsInsufficient() {
         UUID accountId = UUID.randomUUID();
-        TransactionRequestDTO requestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(1000));
+        TransactionRequestDTO requestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(1000), Transaction.Type.WITHDRAW);
         Account account = new Account();
         account.setBalance(BigDecimal.valueOf(500));
 
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
 
         assertThrows(InsufficientBalanceException.class,
-                () -> transactionService.makeTransaction(requestDTO, TransactionType.WITHDRAW));
+                () -> transactionService.makeTransaction(requestDTO));
     }
 
     @Test
