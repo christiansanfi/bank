@@ -20,6 +20,12 @@ public class Transaction {
     @JoinColumn(name = "account_id")
     private Account account;
     private BigDecimal amount;
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private Type type;
     private LocalDateTime date;
+
+    public enum Type {
+        DEPOSIT,
+        WITHDRAW
+    }
 }

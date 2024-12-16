@@ -24,34 +24,23 @@ public class TransactionService {
     public final TransactionMapper transactionMapper;
     public final AccountRepository accountRepository;
 
-
-    public TransactionResponseDTO deposit(TransactionRequestDTO transactionRequestDTO) {
-        UUID id = transactionRequestDTO.getAccountId();
-        Account account = accountRepository.getReferenceById(id);
-        Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, "deposit", account);
-        transaction = transactionRepository.save(transaction);
-        updateBalance(account, transactionRequestDTO.getAmount());
-        account = accountRepository.save(account);
-        return transactionMapper.fromTransactionToGetTransactionResponseDto(transaction);
-    }
-
-    public TransactionResponseDTO withdraw(TransactionRequestDTO transactionRequestDTO) {
-
+    public TransactionResponseDTO makeTransaction(TransactionRequestDTO transactionRequestDTO){
         UUID id = transactionRequestDTO.getAccountId();
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account with id: " + id + " not found"));
 
-        if (!isBalanceSufficient(account.getBalance(), transactionRequestDTO.getAmount())) {
-            throw new InsufficientBalanceException("Balance is not sufficient to cover the withdraw");
+        BigDecimal transactionAmount = transactionRequestDTO.getAmount();
+        if (transactionRequestDTO.getType() == Transaction.Type.WITHDRAW){
+            validateTransaction(account.getBalance(),transactionAmount);
         }
 
-        Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, "withdraw", account);
-        transaction = transactionRepository.save(transaction);
-        updateBalance(account, transactionRequestDTO.getAmount().negate());
-        account = accountRepository.save(account);
+        Transaction transaction = createAndSaveTransaction(transactionRequestDTO, account);
+
+        BigDecimal transactionAmountChanged = (transactionRequestDTO.getType() == Transaction.Type.DEPOSIT) ? transactionAmount : transactionAmount.negate();
+        updateAndSaveAccountBalance(account, transactionAmountChanged);
+
         return transactionMapper.fromTransactionToGetTransactionResponseDto(transaction);
     }
-
 
     public List<TransactionResponseDTO> getLastFiveTransactions(UUID accountId) {
 
@@ -88,6 +77,23 @@ public class TransactionService {
 
     private boolean isBalanceSufficient(BigDecimal accountBalance, BigDecimal withdrawAmount) {
         return accountBalance.compareTo(withdrawAmount) >= 0;
+    }
+
+    private void validateTransaction(BigDecimal balance, BigDecimal transactionAmount){
+        if (!isBalanceSufficient(balance, transactionAmount)){
+            throw new InsufficientBalanceException("Balance is not sufficient");
+        }
+    }
+
+    private Transaction createAndSaveTransaction(TransactionRequestDTO transactionRequestDTO, Account account) {
+        Transaction transaction = transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, account);
+        return transactionRepository.save(transaction);
+    }
+
+    private void updateAndSaveAccountBalance(Account account, BigDecimal amount) {
+        BigDecimal newBalance = account.getBalance().add(amount);
+        account.setBalance(newBalance);
+        accountRepository.save(account);
     }
 }
 

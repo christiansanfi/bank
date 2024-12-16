@@ -20,11 +20,11 @@ public class TransactionMapper {
         return transactionResponseDTO;
     }
 
-    public Transaction fromTransactionRequestDTOToTransactionResponseDTO(TransactionRequestDTO transactionRequestDTO, String type, Account account) {
+    public Transaction fromTransactionRequestDTOToTransactionResponseDTO(TransactionRequestDTO transactionRequestDTO, Account account) {
         Transaction transaction = new Transaction();
         transaction.setId(UUID.randomUUID());
         transaction.setAccount(account);
-        transaction.setType(type);
+        transaction.setType(transactionRequestDTO.getType());
         transaction.setDate(LocalDateTime.now());
         transaction.setAmount(transactionRequestDTO.getAmount());
         return transaction;

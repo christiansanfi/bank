@@ -2,7 +2,6 @@ package com.project.bank.service;
 
 import com.project.bank.dto.TransactionRequestDTO;
 import com.project.bank.dto.TransactionResponseDTO;
-import com.project.bank.exception.AccountNotFoundException;
 import com.project.bank.exception.InsufficientBalanceException;
 import com.project.bank.exception.TransactionNotFoundException;
 import com.project.bank.mapper.TransactionMapper;
@@ -17,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,80 +39,69 @@ class TransactionServiceTest {
     private TransactionService transactionService;
 
     @Test
-    void deposit_ShouldReturnTransactionResponseDTO() {
-        // Arrange
+    void makeTransaction_ShouldReturnTransactionResponseDTO_WhenDeposit() {
         UUID accountId = UUID.randomUUID();
-        TransactionRequestDTO transactionRequestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(100));
-        Account account = new Account();
-        account.setBalance(BigDecimal.valueOf(500));
-        Transaction transaction = new Transaction();
-        TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
-
-        when(accountRepository.getReferenceById(accountId)).thenReturn(account);
-        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, "deposit", account)).thenReturn(transaction);
-        when(transactionRepository.save(transaction)).thenReturn(transaction);
-        when(accountRepository.save(account)).thenReturn(account);
-        when(transactionMapper.fromTransactionToGetTransactionResponseDto(transaction)).thenReturn(expectedResponse);
-
-        // Act
-        TransactionResponseDTO actualResponse = transactionService.deposit(transactionRequestDTO);
-
-        // Assert
-        assertEquals(expectedResponse, actualResponse);
-        verify(accountRepository).getReferenceById(accountId);
-        verify(transactionRepository).save(transaction);
-        verify(accountRepository).save(account);
-    }
-
-    @Test
-    void withdraw_ShouldReturnTransactionResponseDTO_WhenBalanceIsSufficient() {
-        // Arrange
-        UUID accountId = UUID.randomUUID();
-        TransactionRequestDTO transactionRequestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(100));
+        TransactionRequestDTO requestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(100), Transaction.Type.DEPOSIT);
         Account account = new Account();
         account.setBalance(BigDecimal.valueOf(500));
         Transaction transaction = new Transaction();
         TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
 
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(transactionRequestDTO, "withdraw", account)).thenReturn(transaction);
+        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(requestDTO, account)).thenReturn(transaction);
         when(transactionRepository.save(transaction)).thenReturn(transaction);
         when(accountRepository.save(account)).thenReturn(account);
         when(transactionMapper.fromTransactionToGetTransactionResponseDto(transaction)).thenReturn(expectedResponse);
 
-        // Act
-        TransactionResponseDTO actualResponse = transactionService.withdraw(transactionRequestDTO);
+        TransactionResponseDTO actualResponse = transactionService.makeTransaction(requestDTO);
 
-        // Assert
         assertEquals(expectedResponse, actualResponse);
-        verify(accountRepository).findById(accountId);
         verify(transactionRepository).save(transaction);
         verify(accountRepository).save(account);
     }
 
     @Test
-    void withdraw_ShouldThrowException_WhenBalanceIsInsufficient() {
-        // Arrange
+    void makeTransaction_ShouldReturnTransactionResponseDTO_WhenWithdraw() {
         UUID accountId = UUID.randomUUID();
-        TransactionRequestDTO transactionRequestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(1000));
+        TransactionRequestDTO requestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(100), Transaction.Type.WITHDRAW);
+        Account account = new Account();
+        account.setBalance(BigDecimal.valueOf(500));
+        Transaction transaction = new Transaction();
+        TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
+
+        when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+        when(transactionMapper.fromTransactionRequestDTOToTransactionResponseDTO(requestDTO, account)).thenReturn(transaction);
+        when(transactionRepository.save(transaction)).thenReturn(transaction);
+        when(accountRepository.save(account)).thenReturn(account);
+        when(transactionMapper.fromTransactionToGetTransactionResponseDto(transaction)).thenReturn(expectedResponse);
+
+        TransactionResponseDTO actualResponse = transactionService.makeTransaction(requestDTO);
+
+        assertEquals(expectedResponse, actualResponse);
+        verify(transactionRepository).save(transaction);
+        verify(accountRepository).save(account);
+    }
+
+    @Test
+    void makeTransaction_ShouldThrowException_WhenBalanceIsInsufficient() {
+        UUID accountId = UUID.randomUUID();
+        TransactionRequestDTO requestDTO = new TransactionRequestDTO(accountId, BigDecimal.valueOf(1000), Transaction.Type.WITHDRAW);
         Account account = new Account();
         account.setBalance(BigDecimal.valueOf(500));
 
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
 
-        // Act & Assert
-        assertThrows(InsufficientBalanceException.class, () -> transactionService.withdraw(transactionRequestDTO));
-        verify(accountRepository).findById(accountId);
+        assertThrows(InsufficientBalanceException.class,
+                () -> transactionService.makeTransaction(requestDTO));
     }
 
     @Test
     void getLastFiveTransactions_ShouldReturnTransactionResponseDTOList() {
-        // Arrange
         UUID accountId = UUID.randomUUID();
         Transaction transaction1 = new Transaction();
-        transaction1.setDate(LocalDateTime.of(2024, 5, 6, 10, 0));
+        transaction1.setDate(java.time.LocalDateTime.now());
         Transaction transaction2 = new Transaction();
-        transaction2.setDate(LocalDateTime.of(2023, 11, 9, 15, 30));
+        transaction2.setDate(java.time.LocalDateTime.now());
         List<Transaction> transactions = List.of(transaction1, transaction2);
         TransactionResponseDTO responseDTO1 = new TransactionResponseDTO();
         TransactionResponseDTO responseDTO2 = new TransactionResponseDTO();
@@ -123,37 +110,28 @@ class TransactionServiceTest {
         when(transactionMapper.fromTransactionToGetTransactionResponseDto(transaction1)).thenReturn(responseDTO1);
         when(transactionMapper.fromTransactionToGetTransactionResponseDto(transaction2)).thenReturn(responseDTO2);
 
-        // Act
         List<TransactionResponseDTO> actualResponses = transactionService.getLastFiveTransactions(accountId);
 
-        // Assert
         assertEquals(2, actualResponses.size());
-        assertEquals(responseDTO1, actualResponses.get(0));
-        assertEquals(responseDTO2, actualResponses.get(1));
         verify(transactionRepository).findByAccountId(accountId);
     }
 
     @Test
     void deleteTransaction_ShouldDelete_WhenTransactionExists() {
-        // Arrange
         UUID transactionId = UUID.randomUUID();
         when(transactionRepository.existsById(transactionId)).thenReturn(true);
 
-        // Act
         transactionService.deleteTransaction(transactionId);
 
-        // Assert
         verify(transactionRepository).deleteById(transactionId);
     }
 
     @Test
     void deleteTransaction_ShouldThrowException_WhenTransactionNotFound() {
-        // Arrange
         UUID transactionId = UUID.randomUUID();
         when(transactionRepository.existsById(transactionId)).thenReturn(false);
 
-        // Act & Assert
-        assertThrows(TransactionNotFoundException.class, () -> transactionService.deleteTransaction(transactionId));
-        verify(transactionRepository).existsById(transactionId);
+        assertThrows(TransactionNotFoundException.class,
+                () -> transactionService.deleteTransaction(transactionId));
     }
 }

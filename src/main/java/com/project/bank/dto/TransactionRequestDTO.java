@@ -3,6 +3,7 @@ package com.project.bank.dto;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import com.project.bank.model.Transaction;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,4 +17,5 @@ public class TransactionRequestDTO {
     private UUID accountId;
     @Positive(message = "Amount must be higher than 0")
     private BigDecimal amount;
+    private Transaction.Type type;
 }

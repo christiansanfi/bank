@@ -42,7 +42,7 @@ class TransactionRepositoryTest {
         Transaction transaction = new Transaction();
         transaction.setAccount(account);
         transaction.setAmount(BigDecimal.valueOf(100.0));
-        transaction.setType("deposit");
+        transaction.setType(Transaction.Type.DEPOSIT);
         transaction.setDate(LocalDateTime.now());
 
         transactionRepository.save(transaction);
@@ -50,7 +50,7 @@ class TransactionRepositoryTest {
         Transaction persistedTransaction = entityManager.find(Transaction.class, transaction.getId());
         assertNotNull(persistedTransaction);
         assertEquals(BigDecimal.valueOf(100.0), persistedTransaction.getAmount());
-        assertEquals("deposit", persistedTransaction.getType());
+        assertEquals(Transaction.Type.DEPOSIT, persistedTransaction.getType());
         assertEquals(account.getId(), persistedTransaction.getAccount().getId());
     }
 
@@ -59,19 +59,19 @@ class TransactionRepositoryTest {
         Transaction transaction = new Transaction();
         transaction.setAccount(account);
         transaction.setAmount(BigDecimal.valueOf(100.0));
-        transaction.setType("deposit");
+        transaction.setType(Transaction.Type.DEPOSIT);
         transaction.setDate(LocalDateTime.now());
         entityManager.persist(transaction);
         entityManager.flush();
 
         transaction.setAmount(BigDecimal.valueOf(150.0));
-        transaction.setType("withdraw");
+        transaction.setType(Transaction.Type.WITHDRAW);
         transactionRepository.save(transaction);
 
         Transaction updatedTransaction = entityManager.find(Transaction.class, transaction.getId());
         assertNotNull(updatedTransaction);
         assertEquals(BigDecimal.valueOf(150.0), updatedTransaction.getAmount());
-        assertEquals("withdraw", updatedTransaction.getType());
+        assertEquals(Transaction.Type.WITHDRAW, updatedTransaction.getType());
     }
 
     @Test
@@ -79,7 +79,7 @@ class TransactionRepositoryTest {
         Transaction transaction = new Transaction();
         transaction.setAccount(account);
         transaction.setAmount(BigDecimal.valueOf(100.0));
-        transaction.setType("deposit");
+        transaction.setType(Transaction.Type.DEPOSIT);
         transaction.setDate(LocalDateTime.now());
         entityManager.persist(transaction);
         entityManager.flush();

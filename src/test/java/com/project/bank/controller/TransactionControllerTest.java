@@ -2,6 +2,8 @@ package com.project.bank.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.bank.dto.TransactionRequestDTO;
+import com.project.bank.dto.TransactionResponseDTO;
+import com.project.bank.model.Transaction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -29,29 +32,49 @@ class TransactionControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void deposit_ShouldReturnTransactionResponse() throws Exception {
+    void makeTransaction_ShouldReturnTransactionResponse_WhenDeposit() throws Exception {
         TransactionRequestDTO requestDTO = new TransactionRequestDTO(
                 UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
-                BigDecimal.valueOf(100.00)
+                BigDecimal.valueOf(100.00),
+                Transaction.Type.DEPOSIT
         );
 
-        mockMvc.perform(post("/api/transactions/deposit")
+        TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
+        expectedResponse.setAmount(BigDecimal.valueOf(50.00));
+        expectedResponse.setType(Transaction.Type.DEPOSIT);
+        expectedResponse.setDate(LocalDateTime.now());
+
+        mockMvc.perform(post("/api/transactions")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.amount").value(expectedResponse.getAmount().doubleValue()))
+                .andExpect(jsonPath("$.type").value(expectedResponse.getType().toString()))
+                .andExpect(jsonPath("$.date").exists());
     }
 
     @Test
-    void withdraw_ShouldReturnTransactionResponse() throws Exception {
+    void makeTransaction_ShouldReturnTransactionResponse_WhenWithdraw() throws Exception {
         TransactionRequestDTO requestDTO = new TransactionRequestDTO(
                 UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
-                BigDecimal.valueOf(50.00)
+                BigDecimal.valueOf(50.00),
+                Transaction.Type.WITHDRAW
         );
 
-        mockMvc.perform(post("/api/transactions/withdraw")
+        TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
+        expectedResponse.setAmount(BigDecimal.valueOf(50.00));
+        expectedResponse.setType(Transaction.Type.WITHDRAW);
+        expectedResponse.setDate(LocalDateTime.now());
+
+        mockMvc.perform(post("/api/transactions")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.amount").value(expectedResponse.getAmount().doubleValue()))
+                .andExpect(jsonPath("$.type").value(expectedResponse.getType().toString()))
+                .andExpect(jsonPath("$.date").exists());
     }
 
     @Test
@@ -81,18 +104,17 @@ class TransactionControllerTest {
     }
 
     @Test
-    void withdraw_ShouldReturnBadRequest_WhenBalanceIsInsufficient() throws Exception {
+    void makeTransaction_ShouldReturnBadRequest_WhenBalanceIsInsufficient() throws Exception {
         TransactionRequestDTO requestDTO = new TransactionRequestDTO(
                 UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
-                BigDecimal.valueOf(10000.00) // Importo superiore al saldo disponibile
+                BigDecimal.valueOf(10000.00),
+                Transaction.Type.WITHDRAW
         );
 
-        mockMvc.perform(post("/api/transactions/withdraw")
+        mockMvc.perform(post("/api/transactions")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Balance is not sufficient to cover the withdraw"));
+                .andExpect(content().string("Balance is not sufficient"));
     }
-
-
 }
