@@ -2,6 +2,7 @@ package com.project.bank.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.bank.dto.TransactionRequestDTO;
+import com.project.bank.dto.TransactionResponseDTO;
 import com.project.bank.model.Transaction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,10 +39,19 @@ class TransactionControllerTest {
                 Transaction.Type.DEPOSIT
         );
 
+        TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
+        expectedResponse.setAmount(BigDecimal.valueOf(50.00));
+        expectedResponse.setType(Transaction.Type.DEPOSIT);
+        expectedResponse.setDate(LocalDateTime.now());
+
         mockMvc.perform(post("/api/transactions")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.amount").value(expectedResponse.getAmount().doubleValue()))
+                .andExpect(jsonPath("$.type").value(expectedResponse.getType().toString()))
+                .andExpect(jsonPath("$.date").exists());
     }
 
     @Test
@@ -51,10 +62,19 @@ class TransactionControllerTest {
                 Transaction.Type.WITHDRAW
         );
 
+        TransactionResponseDTO expectedResponse = new TransactionResponseDTO();
+        expectedResponse.setAmount(BigDecimal.valueOf(50.00));
+        expectedResponse.setType(Transaction.Type.WITHDRAW);
+        expectedResponse.setDate(LocalDateTime.now());
+
         mockMvc.perform(post("/api/transactions")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(requestDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.amount").value(expectedResponse.getAmount().doubleValue()))
+                .andExpect(jsonPath("$.type").value(expectedResponse.getType().toString()))
+                .andExpect(jsonPath("$.date").exists());
     }
 
     @Test
